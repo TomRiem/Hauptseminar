@@ -4,7 +4,7 @@
 \setbeamertemplate{section in toc}[sections numbered]
 \setbeamertemplate{subsection in toc}[subsections numbered]
 
-\title{Riemannian Symmetric Rank One Trust Region Method}
+\title{Riemannian Trust Region SR1 Method}
 \subtitle{in \lstinline!Manopt.jl!}
 \author{Tom-Christian Riemer}
 \institute{TU Chemnitz}
@@ -51,54 +51,95 @@
     \end{equation*}
 \end{frame}
 
-\begin{frame}{Euclidean Trust Region Method}
-    Quadratic model at current iterate:
+\begin{frame}{Euclidean Trust Region Methods}
+    \alert{Quadratic model} at current iterate:
 	\begin{equation*}
     	m_k(s) = f(x_k) + {\nabla f(x_k)}^{\mathrm{T}} s + \frac{1}{2} s^{\mathrm{T}} H_k s.
     \end{equation*}
-	Finding a step (e.g. tCG):
+	Finding a \alert{step} (e.g. with tCG):
 	\begin{equation*}
-        s_k = \arg \min_{\lVert s \rVert_2 \leq \Delta_k} m_k(s)
+        s_k = \arg \min_{\lVert s \rVert_2 \leq \Delta_k} m_k(s),
     \end{equation*}
-	where $\Delta_k > 0$ defines the trust region. The candidate of next iterate is
+	where $\Delta_k > 0$ defines the \alert{trust region}. The candidate of the next iterate is
 	\begin{equation*}
-        \tilde{x}_{k+1} = x_k + s_k.
+        \tilde{x}_{k+1} = \alert{x_k + s_k}.
     \end{equation*}
-	If $(f(x_k) - f(\tilde{x}_{k+1}))/(m_k(0) - m_k(s_k)) > \rho$ then $x_{k+1} = \tilde{x}_{k+1}$, the model $m_k(\cdot) \rightarrow m_{k+1}(\cdot)$ and trust region $\Delta_k \rightarrow \Delta_{k+1}$ will be updated accordingly. 
+	If $(f(x_k) - f(\tilde{x}_{k+1}))/(m_k(0) - m_k(s_k)) = \rho_k > \rho^{\prime}$ then $x_{k+1} = \tilde{x}_{k+1}$ and the trust region radius is also updated $\Delta_k \rightarrow \Delta_{k+1}$ depending on $\rho_k$.  
 \end{frame}
 
-\begin{frame}{Riemannian Metric and Tangent Spaces}
+\begin{frame}{Tangent Spaces}
     \vspace{-1\baselineskip}\hfill{\tiny{[Absil, Mahony, Sepulchre, 2008]}}
     \begin{center}
         \includegraphics[width=5cm]{img/Riemannian_Metric.png}
     \end{center}
-    \textbf{Tangent space} $\tangent{x}$ at $x$, with inner product $g_x(\cdot, \cdot)$. \\[0.2\baselineskip]
-    \textbf{Riemannian gradient} $\mathrm{D} \, f(x) [\eta_x] = g_x (\operatorname{grad} f(x), \eta_x), \; \forall \eta_x \in \tangent{x}$. \\[0.2\baselineskip]
+    \textbf{Tangent space} $\tangent{x}$ at $x$ is the set of all tangent vectors (directions) at $x$. $\tangent{x}$ is a linear space. \\[0.2\baselineskip]
+    \textbf{Riemannian metric} $g_{\cdot} (\cdot, \cdot)$ is a smoothly-varying inner product on the tangent spaces. Norm: $\lVert \xi_x \rVert_x = \sqrt{g_x(\xi_x, \xi_x)}$. \\[0.2\baselineskip]
+    \textbf{Riemannian gradient} $\mathrm{D} \, f(x) [\eta_x] = g_x (\operatorname{grad} f(x), \eta_x),$ $\forall \eta_x \in \tangent{x}$.
 \end{frame}
 
 \begin{frame}{Retractions}
     \vspace{-1\baselineskip}\hfill{\tiny{[Bergmann, 2017]}}
     \begin{center}
-        \includegraphics[width=4.5cm]{img/Retraction.png}
+        \includegraphics[width=5cm]{img/Retraction.png}
     \end{center}
-    \textbf{Retraction} $R_{x}(\xi_x) \in \mathcal{M}$ with $R_x (0_x) = x$ and $\mathrm{D} \, R_x (0_x)[\xi_x] = \xi_x$.
+    A \textbf{Retraction} is a continuously differentiable map $R \colon \tangent{} \to \mathcal{M}$, which satisfies \\[-0.2\baselineskip]
+    \begin{itemize}
+        \item $R_x (0_x) = x$ and
+        \item $\mathrm{D} \, R_x (0_x)[\xi_x] = \xi_x, \, \forall \xi_x \in \tangent{x}$
+    \end{itemize}
 \end{frame}
 
 \begin{frame}{Quadratic Term}
 	\begin{equation*}
-		m_k(\eta) = f(x_k) + g_{x_k}(\operatorname{grad}f(x_k), \eta) + \frac{1}{2} g_{x_k}(\eta, \mathcal{H}_k [\eta]).
-	\end{equation*}
-    \textbf{Newton} TR Method: $\mathcal{H}_k = \operatorname{Hess} f(x_k) \colon \tangent{x_k} \to \tangent{x_k}, \; \eta_{x_k} \mapsto \nabla_{\eta_{x_k}} \operatorname{grad} f(x_k)$
-	\textbf{SR1} TR Method: $\mathcal{H}_k \approx \operatorname{Hess} f(x_k)$
+		\alert{m_k}(\eta) = f(x_k) + g_{x_k}(\operatorname{grad}f(x_k), \eta) + \frac{1}{2} g_{x_k}(\eta, \mathcal{H}_k [\eta]).
+	\end{equation*} 
+    \begin{equation*}
+        \alert{\tangent{x_k} \ni \eta_k} = \arg \min_{\alert{\lVert} \eta \alert{\rVert_{x_k}} \leq \Delta_k} m_k(\eta),
+    \end{equation*}
+    \begin{equation*}
+        \tilde{x}_{k+1} = \alert{R_{x_k}(\eta_k)}.
+    \end{equation*} \\[0.5\baselineskip]
+    \textbf{TR Newton Method}: \\
+    $\mathcal{H}_k = \operatorname{Hess} f(x_k) \colon \tangent{x_k} \ni \eta_{x_k} \mapsto \nabla_{\eta_{x_k}} \operatorname{grad} f(x_k) \in \tangent{x_k}$. \\[0.5\baselineskip]
+	\textbf{TR SR1 Method}: \\
+    $\mathcal{H}_k \approx \operatorname{Hess} f(x_k)$, where $\mathcal{H}_k \rightarrow \mathcal{H}_{k+1} \colon \tangent{x_{k+1}} \to \tangent{x_{k+1}}$ using $\eta_k \in \tangent{x_k}$ and $\operatorname{grad}f(\tilde{x}_{k+1}) \in \tangent{\tilde{x}_{k+1}}$.
 \end{frame}
 
 \begin{frame}{Vector Transports}
     \vspace{-1\baselineskip}\hfill{\tiny{[Bergmann, 2017]}}
     \begin{center}
-        \includegraphics[width=4.5cm]{img/Vector_Transport.png}
+        \includegraphics[width=5cm]{img/Vector_Transport.png}
     \end{center}
-    \textbf{Isometric VT} satisfies $\lVert \nu_x \rVert_x = \lVert T^{S}_{x, \xi_x}(\nu_x) \rVert_{R_x(\xi_x)}$.
+    \textbf{Vector Transport} is a smooth linear map $T_x \colon \tangent{x} \oplus \tangent{x} \ni (\eta_x, \xi_x) \mapsto T_{x, \eta_x}(\xi_x) \in \tangent{R_x(\eta_x)}$. \\[0.2\baselineskip]
+    \textbf{Isometric VT} satisfies $\lVert \xi_x \rVert_x = \lVert T^{S}_{x, \eta_x}(\xi_x) \rVert_{R_x(\eta_x)}$.
 \end{frame}
+
+
+\begin{frame}{Symmetric Rank One Update}
+    We set
+    \begin{align*}
+        & s_k = \eta_k \in \tangent{x_k} \\
+        & y_k = {T^{S}_{x_k, \eta_k}}^{-1} ( \operatorname{grad}f(\tilde{x}_{k+1}) ) - \operatorname{grad}f(x_k) \in \tangent{x_k}.
+    \end{align*}
+    If 
+    \begin{equation*}
+        \lvert g_{x_k}(s_k, y_k - \mathcal{H}_k[s_k]) \rvert \geq \nu \; \lVert s_k \rVert_{x_k} \lVert y_k - \mathcal{H}_k[s_k] \rVert_{x_k},
+    \end{equation*}
+    where $\nu \in (0,1)$, then
+    \begin{equation*}
+        \tilde{\mathcal{H}}_{k+1} [\cdot] = \mathcal{H}_k [\cdot] + \frac{(y_k - \mathcal{H}_k [s_k]) (y_k - \mathcal{H}_k [s_k])^{\flat} [\cdot] }{(y_k - \mathcal{H}_k [s_k])^{\flat} [s_k]},
+    \end{equation*}
+    where $\xi^{\flat}_{x_k} \colon \tangent{x_k} \ni \zeta_{x_k} \mapsto g_{x_k}(\xi_{x_k}, \zeta_{x_k}), \; \forall \xi_{x_k} \in \tangent{x_k}$.
+\end{frame}
+
+\begin{frame}{RTR-SR1 Method}
+    Pseudocode
+\end{frame}
+
+\begin{frame}{Convergence}
+    most relevant convergence statements (global and superlinear)
+\end{frame}
+
 
 \section{Numerics}
 
