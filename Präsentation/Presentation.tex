@@ -65,7 +65,7 @@
 	\begin{equation*}
         \widetilde{x}_{k+1} = \alert{x_k + s_k}.
     \end{equation*}
-	We take $\widetilde{x}_{k+1}$ as the next iterate if $\frac{f(x_k) - f(\widetilde{x}_{k+1})}{m_k(0) - m_k(s_k)} = \rho_k > \rho^{\prime}$.
+	We take $\widetilde{x}_{k+1}$ as the next iterate if $\frac{f(x_k) - f(\widetilde{x}_{k+1})}{m_k(0) - m_k(s_k)} = > \rho^{\prime}$.
 \end{frame}
 
 \begin{frame}{Tangent Spaces}
@@ -111,30 +111,37 @@
     \begin{center}
         \includegraphics[width=5cm]{img/Vector_Transport.png}
     \end{center}
-    \textbf{Vector Transport} is a smooth linear map $T_x \colon \tangent{x} \times \tangent{x} \ni (\eta_x, \xi_x) \mapsto T_{x, \eta_x}(\xi_x) \in \tangent{R_x(\eta_x)}$. \\[0.3\baselineskip]
+    \textbf{Vector Transport} is a smooth linear map $T_x \colon \tangent{x} \times \tangent{x} \ni (\eta_x, \xi_x) \mapsto T_{x, \eta_x}(\xi_x) \in \tangent{R_x(\eta_x)}$. \\[0.5\baselineskip]
     \textbf{Isometric VT} satisfies $\lVert \xi_x \rVert_x = \lVert T^{S}_{x, \eta_x}(\xi_x) \rVert_{R_x(\eta_x)}$.
 \end{frame}
 
-
+% The link to the Euclidean variant must still be found, in which it is made clear that eta_k generalizes the distance between x_k and x_k+1. Maybe another slide.
 \begin{frame}{Symmetric Rank One Update}
     We set
     \begin{align*}
-        & s_k = \eta_k \in \tangent{x_k} \; (\widetilde{x}_{k+1} = R_{x_k}(\eta_k))\\
+        & s_k = \eta_k \in \tangent{x_k} \quad (\widetilde{x}_{k+1} = R_{x_k}(\eta_k))\\
         & y_k = {T^{S}_{x_k, \eta_k}}^{-1} ( \operatorname{grad}f(\widetilde{x}_{k+1}) ) - \operatorname{grad}f(x_k) \in \tangent{x_k}.
     \end{align*}
     If 
     \begin{equation*}
-        \lvert g_{x_k}(s_k, y_k - \mathcal{H}_k[s_k]) \rvert \geq \nu \; \lVert s_k \rVert_{x_k} \lVert y_k - \mathcal{H}_k[s_k] \rVert_{x_k},
+        \lvert g_{x_k}(s_k, y_k - \mathcal{H}^{SR1}_k[s_k]) \rvert \geq \nu \; \lVert s_k \rVert_{x_k} \lVert y_k - \mathcal{H}^{SR1}_k[s_k] \rVert_{x_k},
     \end{equation*}
     where $\nu \in (0,1)$, then
     \begin{equation*}
-        \widetilde{\mathcal{H}}_{k+1} [\cdot] = \mathcal{H}_k [\cdot] + \frac{(y_k - \mathcal{H}_k [s_k]) (y_k - \mathcal{H}_k [s_k])^{\flat} [\cdot] }{(y_k - \mathcal{H}_k [s_k])^{\flat} [s_k]},
+        \widetilde{\mathcal{H}}^{SR1}_{k+1} [\cdot] = \mathcal{H}^{SR1}_k [\cdot] + \frac{(y_k - \mathcal{H}^{SR1}_k [s_k]) (y_k - \mathcal{H}^{SR1}_k [s_k])^{\flat} [\cdot] }{(y_k - \mathcal{H}^{SR1}_k [s_k])^{\flat} [s_k]},
     \end{equation*}
     where $\xi^{\flat}_{x_k} \colon \tangent{x_k} \ni \zeta_{x_k} \mapsto g_{x_k}(\xi_{x_k}, \zeta_{x_k}),$ for all $\xi_{x_k} \in \tangent{x_k}$.
 \end{frame}
 
 \begin{frame}{RTR-SR1 Method}
-    Pseudocode
+    Do until converged
+    \begin{enumerate}
+        \item Create quadratic local model $m_k(\eta)$ with $\mathcal{H}^{SR1}_k$. \\[0.2\baselineskip]
+        \item Obtain $\eta_k$ by (approximately) solving $m_k(\eta)$. \\[0.2\baselineskip]
+        \item Define $s_k, \ y_k$ and update $\mathcal{H}^{SR1}_k \rightarrow \widetilde{\mathcal{H}}^{SR1}_{k+1}$ if $\lvert g_{x_k}(s_k, y_k - \mathcal{H}_k[s_k]) \rvert \geq \nu \; \lVert s_k \rVert_{x_k} \lVert y_k - \mathcal{H}_k[s_k] \rVert_{x_k}$. \\[0.2\baselineskip]
+        \item If $\frac{f(x_k) - f(\widetilde{x}_{k+1})}{m_k(0) - m_k(s_k)} > \rho^{\prime}$ set $x_{k+1} = \widetilde{x}_{k+1} = R_{x_k}(\eta_k)$ and $\mathcal{H}^{SR1}_{k+1} = T^{S}_{x_k, \eta_k} \circ \widetilde{\mathcal{H}}^{SR1}_{k+1} \circ  {T^{S}_{x_k, \eta_k}}^{-1}$, else $x_{k+1} = x_k$ and $\mathcal{H}^{SR1}_{k+1} = \widetilde{\mathcal{H}}^{SR1}_{k+1}$.\\[0.2\baselineskip]
+        \item Update trust region radius $\Delta_k \rightarrow \Delta_{k+1}$.
+    \end{enumerate}
 \end{frame}
 
 \begin{frame}{Convergence}
