@@ -60,11 +60,12 @@
 	\begin{equation*}
         s_k = \arg \min_{\lVert s \rVert_2 \leq \Delta_k} m_k(s),
     \end{equation*}
-	where $\Delta_k > 0$ defines the \alert{trust region}. The candidate of the next iterate is
+	where $\Delta_k > 0$ defines the \alert{trust region}. \\
+    The candidate of the next iterate is
 	\begin{equation*}
-        \tilde{x}_{k+1} = \alert{x_k + s_k}.
+        \widetilde{x}_{k+1} = \alert{x_k + s_k}.
     \end{equation*}
-	If $(f(x_k) - f(\tilde{x}_{k+1}))/(m_k(0) - m_k(s_k)) = \rho_k > \rho^{\prime}$ then $x_{k+1} = \tilde{x}_{k+1}$ and the trust region radius is also updated $\Delta_k \rightarrow \Delta_{k+1}$ depending on $\rho_k$.  
+	We take $\widetilde{x}_{k+1}$ as the next iterate if $\frac{f(x_k) - f(\widetilde{x}_{k+1})}{m_k(0) - m_k(s_k)} = \rho_k > \rho^{\prime}$.
 \end{frame}
 
 \begin{frame}{Tangent Spaces}
@@ -74,43 +75,43 @@
     \end{center}
     \textbf{Tangent space} $\tangent{x}$ at $x$ is the set of all tangent vectors (directions) at $x$. $\tangent{x}$ is a linear space. \\[0.2\baselineskip]
     \textbf{Riemannian metric} $g_{\cdot} (\cdot, \cdot)$ is a smoothly-varying inner product on the tangent spaces. Norm: $\lVert \xi_x \rVert_x = \sqrt{g_x(\xi_x, \xi_x)}$. \\[0.2\baselineskip]
-    \textbf{Riemannian gradient} $\mathrm{D} \, f(x) [\eta_x] = g_x (\operatorname{grad} f(x), \eta_x),$ $\forall \eta_x \in \tangent{x}$.
+    \textbf{Riemannian gradient} $\mathrm{D} \, f(x) [\eta_x] = g_x (\operatorname{grad} f(x), \eta_x),$ for all $\eta_x \in \tangent{x}$.
 \end{frame}
 
 \begin{frame}{Retractions}
-    \vspace{-1\baselineskip}\hfill{\tiny{[Bergmann, 2017]}}
+    \vspace{-1\baselineskip}\hfill{\tiny{[Absil, Mahony, Sepulchre, 2008]}}
     \begin{center}
         \includegraphics[width=5cm]{img/Retraction.png}
     \end{center}
-    A \textbf{Retraction} is a continuously differentiable map $R \colon \tangent{} \to \mathcal{M}$, which satisfies \\[-0.2\baselineskip]
+    A \textbf{Retraction} is a continuously differentiable map $R \colon \tangent{} \to \mathcal{M}$, which satisfies \\[-0.1\baselineskip]
     \begin{itemize}
         \item $R_x (0_x) = x$ and
-        \item $\mathrm{D} \, R_x (0_x)[\xi_x] = \xi_x, \, \forall \xi_x \in \tangent{x}$
+        \item $\mathrm{D} \, R_x (0_x)[\xi_x] = \xi_x,$ for all $\xi_x \in \tangent{x}$
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Quadratic Term}
-	\begin{equation*}
-		\alert{m_k}(\eta) = f(x_k) + g_{x_k}(\operatorname{grad}f(x_k), \eta) + \frac{1}{2} g_{x_k}(\eta, \mathcal{H}_k [\eta]).
-	\end{equation*} 
-    \begin{equation*}
-        \alert{\tangent{x_k} \ni \eta_k} = \arg \min_{\alert{\lVert} \eta \alert{\rVert_{x_k}} \leq \Delta_k} m_k(\eta),
-    \end{equation*}
-    \begin{equation*}
-        \tilde{x}_{k+1} = \alert{R_{x_k}(\eta_k)}.
-    \end{equation*} \\[0.5\baselineskip]
+\begin{frame}{Riemannian Quadratic Model}
+    \begin{align*}
+        \alert{m_k}(\eta) = f(x_k) + g_{x_k}(\operatorname{grad} & f(x_k), \eta) + \frac{1}{2} g_{x_k}(\eta, \textcolor{red}{\mathcal{H}_k} [\eta]) \\
+        \text{Step: } \alert{\tangent{x_k} \ni \eta_k} & = \arg \min_{\alert{\lVert} \eta \alert{\rVert_{x_k}} \leq \Delta_k} m_k(\eta) \\
+        \text{Candidate: } \widetilde{x}_{k+1} & = \alert{R_{x_k}(\eta_k)}
+    \end{align*} \\[0.5\baselineskip]
     \textbf{TR Newton Method}: \\
     $\mathcal{H}_k = \operatorname{Hess} f(x_k) \colon \tangent{x_k} \ni \eta_{x_k} \mapsto \nabla_{\eta_{x_k}} \operatorname{grad} f(x_k) \in \tangent{x_k}$. \\[0.5\baselineskip]
 	\textbf{TR SR1 Method}: \\
-    $\mathcal{H}_k \approx \operatorname{Hess} f(x_k)$, where $\mathcal{H}_k \rightarrow \mathcal{H}_{k+1} \colon \tangent{x_{k+1}} \to \tangent{x_{k+1}}$ using $\eta_k \in \tangent{x_k}$ and $\operatorname{grad}f(\tilde{x}_{k+1}) \in \tangent{\tilde{x}_{k+1}}$.
+    $\mathcal{H}_k = \mathcal{H}^{SR1}_k \approx \operatorname{Hess} f(x_k)$ \\[-0.1\baselineskip]
+    \begin{itemize}
+        \item $\mathcal{H}^{SR1}_k \rightarrow \widetilde{\mathcal{H}}^{SR1}_{k+1} \colon \tangent{x_k} \to \tangent{x_k}$ using $\eta_k \in \tangent{x_k}$ and $\operatorname{grad}f(\widetilde{x}_{k+1}) \in \tangent{\widetilde{x}_{k+1}}$.
+        \item $\widetilde{\mathcal{H}}^{SR1}_{k+1} \rightarrow \mathcal{H}^{SR1}_{k+1} \colon \tangent{x_{k+1}} \to \tangent{x_{k+1}}$
+    \end{itemize}
 \end{frame}
 
 \begin{frame}{Vector Transports}
-    \vspace{-1\baselineskip}\hfill{\tiny{[Bergmann, 2017]}}
+    \vspace{-1\baselineskip}\hfill{\tiny{[Absil, Mahony, Sepulchre, 2008]}}
     \begin{center}
         \includegraphics[width=5cm]{img/Vector_Transport.png}
     \end{center}
-    \textbf{Vector Transport} is a smooth linear map $T_x \colon \tangent{x} \oplus \tangent{x} \ni (\eta_x, \xi_x) \mapsto T_{x, \eta_x}(\xi_x) \in \tangent{R_x(\eta_x)}$. \\[0.2\baselineskip]
+    \textbf{Vector Transport} is a smooth linear map $T_x \colon \tangent{x} \times \tangent{x} \ni (\eta_x, \xi_x) \mapsto T_{x, \eta_x}(\xi_x) \in \tangent{R_x(\eta_x)}$. \\[0.3\baselineskip]
     \textbf{Isometric VT} satisfies $\lVert \xi_x \rVert_x = \lVert T^{S}_{x, \eta_x}(\xi_x) \rVert_{R_x(\eta_x)}$.
 \end{frame}
 
@@ -118,8 +119,8 @@
 \begin{frame}{Symmetric Rank One Update}
     We set
     \begin{align*}
-        & s_k = \eta_k \in \tangent{x_k} \\
-        & y_k = {T^{S}_{x_k, \eta_k}}^{-1} ( \operatorname{grad}f(\tilde{x}_{k+1}) ) - \operatorname{grad}f(x_k) \in \tangent{x_k}.
+        & s_k = \eta_k \in \tangent{x_k} \; (\widetilde{x}_{k+1} = R_{x_k}(\eta_k))\\
+        & y_k = {T^{S}_{x_k, \eta_k}}^{-1} ( \operatorname{grad}f(\widetilde{x}_{k+1}) ) - \operatorname{grad}f(x_k) \in \tangent{x_k}.
     \end{align*}
     If 
     \begin{equation*}
@@ -127,9 +128,9 @@
     \end{equation*}
     where $\nu \in (0,1)$, then
     \begin{equation*}
-        \tilde{\mathcal{H}}_{k+1} [\cdot] = \mathcal{H}_k [\cdot] + \frac{(y_k - \mathcal{H}_k [s_k]) (y_k - \mathcal{H}_k [s_k])^{\flat} [\cdot] }{(y_k - \mathcal{H}_k [s_k])^{\flat} [s_k]},
+        \widetilde{\mathcal{H}}_{k+1} [\cdot] = \mathcal{H}_k [\cdot] + \frac{(y_k - \mathcal{H}_k [s_k]) (y_k - \mathcal{H}_k [s_k])^{\flat} [\cdot] }{(y_k - \mathcal{H}_k [s_k])^{\flat} [s_k]},
     \end{equation*}
-    where $\xi^{\flat}_{x_k} \colon \tangent{x_k} \ni \zeta_{x_k} \mapsto g_{x_k}(\xi_{x_k}, \zeta_{x_k}), \; \forall \xi_{x_k} \in \tangent{x_k}$.
+    where $\xi^{\flat}_{x_k} \colon \tangent{x_k} \ni \zeta_{x_k} \mapsto g_{x_k}(\xi_{x_k}, \zeta_{x_k}),$ for all $\xi_{x_k} \in \tangent{x_k}$.
 \end{frame}
 
 \begin{frame}{RTR-SR1 Method}
