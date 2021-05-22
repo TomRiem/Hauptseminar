@@ -134,7 +134,7 @@
 \end{frame}
 
 \begin{frame}{RTR-SR1 Method}
-    Do until converged
+    Do until converged:
     \begin{enumerate}
         \item Create quadratic local model $m_k(\eta)$ with $\mathcal{H}^{SR1}_k$. \\[0.2\baselineskip]
         \item Obtain $\eta_k$ by (approximately) solving $m_k(\eta)$. \\[0.2\baselineskip]
@@ -145,23 +145,36 @@
 \end{frame}
 
 \begin{frame}{Convergence}
-    most relevant convergence statements (global and superlinear)
+    \vspace{-1\baselineskip}\hfill{\tiny{[Huang, 2011]}} \\[0.2\baselineskip]
+    Suppose $f \in C^2$, bounded below on the sublevel set $\{ x \in \mathcal{M} \colon f(x) \leq f(x_0) \}$ and under reasonable assumptions we get 
+    \begin{itemize}
+        \item \alert{global covergence}, i.e. $\lim_{k \rightarrow \infty} \operatorname{grad} f(x_k) = 0$.
+        \item if $\operatorname{Hess} f$ satisfies a Riemannian generalization of Lipschitz continuity around the minimizer $x^*$, then $\{ x_k \}_k$ converges to $x^*$ $\alert{n + 1}$\alert{-step superlinearly}, i.e. \begin{equation*}\lim_{k \rightarrow \infty} \frac{\operatorname{dist}(x_{k+n+1}, x^*)}{\operatorname{dist}(x_k, x^*)} = 0, \end{equation*} where $n$ is the dimension of the manifold.
+    \end{itemize}
 \end{frame}
 
 
 \section{Numerics}
 
 \begin{frame}{Rayleigh Quotient Minimization}
-    $A \in \mathbb{R}^{n \times n}$ symmetric, the unit-norm eigenvector, $v \in \mathbb{R}^n$, corresponding to the smallest eigenvalue, defines the two global minima, $\pm v$, of the Rayleigh quotient  
+    $A \in \mathbb{R}^{n \times n}$ symmetric, eigenvector $v \in \mathbb{R}^n$ to the smallest eigenvalue defines the two global minima $\pm v$
     \begin{equation*}
         \begin{split}
             f \colon \; \mathbb{S}^{n-1} & \to \mathbb{R} \\
-            x & \mapsto x^{\mathrm{T}} A x 
+            x & \mapsto x^{\mathrm{T}} A x
         \end{split}
-    \end{equation*}   
-    with its Riemannian gradient \\[.3\baselineskip]
+    \end{equation*} \\[-0.5\baselineskip]
     \begin{equation*}
-        \operatorname{grad} f(x) = 2(Ax - x x^{\mathrm{T}} A x).
+        \operatorname{grad} f(x) = 2(Ax - x x^{\mathrm{T}} A x)
+    \end{equation*}
+    \begin{equation*}
+        \operatorname{Hess} f(x) [\xi_x] = 2 (A \xi_x - x x^{\mathrm{T}} A \xi_x - \xi_x x^{\mathrm{T}} A x - x x^{\mathrm{T}} \xi_x x^{\mathrm{T}} A x)
+    \end{equation*}
+    \begin{equation*}
+        R_x (\xi_x) = \frac{x + \xi_x}{\lVert x + \xi_x \rVert_2}
+    \end{equation*}
+    \begin{equation*}
+        T_{x, \eta_x}(\xi_x) = \xi_x - \frac{2 y^{\mathrm{T}} \xi_x}{\lVert x + y \rVert^{2}_2} (x + y)
     \end{equation*}
 \end{frame}
 
@@ -170,13 +183,30 @@
 \end{frame}
 
 \begin{frame}{Results}
-    Table with results.
+    Comparison of ... in an average of 10 random runs:
+    \begin{table}[H]
+        \resizebox{\textwidth}{!}{
+            \begin{tabular}{l l l l l l l l l l}
+                \toprule
+                Manifold & \multicolumn{3}{c}{$\mathbb{S}^{49}$}& \multicolumn{3}{c}{$\mathbb{S}^{99}$} & \multicolumn{3}{c}{$\mathbb{S}^{199}$}\\ 
+                \midrule
+                Quadratic term & Newton & SR1 & BFGS & Newton & SR1 & BFGS & Newton & SR1 & BFGS \\ 
+                \midrule
+                Time in seconds & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$\\ 
+                \midrule
+                Iterations & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ \\
+                \bottomrule
+            \end{tabular}
+        }
+    \end{table}
 \end{frame}
 
 \section{Conclusion}
 
 \begin{frame}{Conclusion}
-    
+    \begin{itemize}
+        \item Global convergence
+    \end{itemize}
     \begin{center}
         Thank you for your attention! Questions? 
     \end{center}
