@@ -4,11 +4,11 @@
 \setbeamertemplate{section in toc}[sections numbered]
 \setbeamertemplate{subsection in toc}[subsections numbered]
 
-\title{Riemannian Trust Region SR1 Method}
+\title{Riemannian Trust-Region SR1 Method}
 \subtitle{in \lstinline!Manopt.jl!}
 \author{Tom-Christian Riemer}
 \institute{TU Chemnitz}
-\date{Research Seminar Numeric,\\ 9th Juny 2021}
+\date{Research Seminar Numeric,\\ 16th June 2021}
 
 %packages
 \usepackage{amsmath}
@@ -51,7 +51,7 @@
     \end{equation*}
 \end{frame}
 
-\begin{frame}{Euclidean Trust Region Methods}
+\begin{frame}{Euclidean Trust-Region Methods}
     \alert{Quadratic model} at current iterate:
 	\begin{equation*}
     	m_k(s) = f(x_k) + {\nabla f(x_k)}^{\mathrm{T}} s + \frac{1}{2} s^{\mathrm{T}} H_k s.
@@ -60,13 +60,16 @@
 	\begin{equation*}
         s_k = \arg \min_{\lVert s \rVert_2 \leq \Delta_k} m_k(s),
     \end{equation*}
-	where $\Delta_k > 0$ defines the \alert{trust region}. \\
+	where $\Delta_k > 0$ defines the \alert{trust-region}. \\
     The candidate of the next iterate is
 	\begin{equation*}
         \widetilde{x}_{k+1} = \alert{x_k + s_k}.
     \end{equation*}
-	We take $\widetilde{x}_{k+1}$ as the next iterate if $\frac{f(x_k) - f(\widetilde{x}_{k+1})}{m_k(0) - m_k(s_k)} = > \rho^{\prime}$.
+	We take $\widetilde{x}_{k+1}$ as the next iterate if $\frac{f(x_k) - f(\widetilde{x}_{k+1})}{m_k(0) - m_k(s_k)} =\rho_k > \rho^{\prime}$. \\
+    Update $\Delta_k \rightarrow \Delta_{k+1}$ depending on $\rho_k$ and $s_k$.
 \end{frame}
+
+\section{RTR-SR1 Method}
 
 \begin{frame}{Tangent Spaces}
     \vspace{-1\baselineskip}\hfill{\tiny{[Absil, Mahony, Sepulchre, 2008]}}
@@ -99,10 +102,10 @@
     \textbf{TR Newton Method}: \\
     $\mathcal{H}_k = \operatorname{Hess} f(x_k) \colon \tangent{x_k} \ni \eta_{x_k} \mapsto \nabla_{\eta_{x_k}} \operatorname{grad} f(x_k) \in \tangent{x_k}$. \\[0.5\baselineskip]
 	\textbf{TR SR1 Method}: \\
-    $\mathcal{H}_k = \mathcal{H}^{SR1}_k \approx \operatorname{Hess} f(x_k)$ \\[-0.1\baselineskip]
+    $\mathcal{H}_k = \mathcal{H}^{SR1}_k \approx \operatorname{Hess} f(x_k)$. \\[-0.1\baselineskip]
     \begin{itemize}
-        \item $\mathcal{H}^{SR1}_k \rightarrow \widetilde{\mathcal{H}}^{SR1}_{k+1} \colon \tangent{x_k} \to \tangent{x_k}$ using $\eta_k \in \tangent{x_k}$ and $\operatorname{grad}f(\widetilde{x}_{k+1}) \in \tangent{\widetilde{x}_{k+1}}$.
-        \item $\widetilde{\mathcal{H}}^{SR1}_{k+1} \rightarrow \mathcal{H}^{SR1}_{k+1} \colon \tangent{x_{k+1}} \to \tangent{x_{k+1}}$
+        \item $\mathcal{H}^{SR1}_k \rightarrow \widetilde{\mathcal{H}}^{SR1}_{k+1} \colon \textcolor{red}{\tangent{x_k}} \to \textcolor{red}{\tangent{x_k}}$ using $\eta_k \in \tangent{x_k}$ and $\operatorname{grad}f(\widetilde{x}_{k+1}) \in \textcolor{red}{\tangent{\widetilde{x}_{k+1}}}$.
+        \item $\widetilde{\mathcal{H}}^{SR1}_{k+1} \rightarrow \mathcal{H}^{SR1}_{k+1} \colon \textcolor{red}{\tangent{x_{k+1}}} \to \textcolor{red}{\tangent{x_{k+1}}}$.
     \end{itemize}
 \end{frame}
 
@@ -140,7 +143,7 @@
         \item Obtain $\eta_k$ by (approximately) solving $m_k(\eta)$. \\[0.2\baselineskip]
         \item Define $s_k, \ y_k$ and update $\mathcal{H}^{SR1}_k \rightarrow \widetilde{\mathcal{H}}^{SR1}_{k+1}$ if $\lvert g_{x_k}(s_k, y_k - \mathcal{H}_k[s_k]) \rvert \geq \nu \; \lVert s_k \rVert_{x_k} \lVert y_k - \mathcal{H}_k[s_k] \rVert_{x_k}$. \\[0.2\baselineskip]
         \item If $\frac{f(x_k) - f(\widetilde{x}_{k+1})}{m_k(0) - m_k(s_k)} > \rho^{\prime}$ set $x_{k+1} = \widetilde{x}_{k+1} = R_{x_k}(\eta_k)$ and $\mathcal{H}^{SR1}_{k+1} = T^{S}_{x_k, \eta_k} \circ \widetilde{\mathcal{H}}^{SR1}_{k+1} \circ  {T^{S}_{x_k, \eta_k}}^{-1}$, else $x_{k+1} = x_k$ and $\mathcal{H}^{SR1}_{k+1} = \widetilde{\mathcal{H}}^{SR1}_{k+1}$.\\[0.2\baselineskip]
-        \item Update trust region radius $\Delta_k \rightarrow \Delta_{k+1}$.
+        \item Update trust-region radius $\Delta_k \rightarrow \Delta_{k+1}$.
     \end{enumerate}
 \end{frame}
 
