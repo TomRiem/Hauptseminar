@@ -39,7 +39,7 @@
 \section{Introduction}
 
 \begin{frame}{Riemannian Optimization}
-    Finding a \textbf{minimum} of a real-valued function $f$ on a Riemannian manifold, i.e.
+    Finding a \textbf{minimum} of a real-valued function $f$ on a Riemannian manifold, i.e. \\
     \begin{equation*}
         \min f(x), \quad x \in \mathcal{M}.
     \end{equation*}\\[1.\baselineskip]
@@ -47,7 +47,7 @@
         \textbf{Riemannian manifold} = smooth manifold + Riemannian metric. \\[1.\baselineskip]
     \end{center}
     \begin{equation*}
-        \mathbb{S}^{n-1} = \{ x \in \mathbb{R}^n \colon \; \lVert x \rVert_2 = 1 \}
+        \mathbb{S}^{n-1} = \{ x \in \mathbb{R}^n \colon \; \lVert x \rVert_2 = 1 \}.
     \end{equation*}
 \end{frame}
 
@@ -65,14 +65,14 @@
 	\begin{equation*}
         \widetilde{x}_{k+1} = \alert{x_k + s_k}.
     \end{equation*}
-	We take $\widetilde{x}_{k+1}$ as the next iterate if $\frac{f(x_k) - f(\widetilde{x}_{k+1})}{m_k(0) - m_k(s_k)} =\rho_k > \rho^{\prime}$. \\
-    Update $\Delta_k \rightarrow \Delta_{k+1}$ depending on $\rho_k$ and $s_k$.
+	We take $\widetilde{x}_{k+1}$ as the next iterate if $\frac{f(x_k) - f(\widetilde{x}_{k+1})}{m_k(0) - m_k(s_k)} =\rho_k > \rho^{\prime}$. \\[0.1\baselineskip]
+    Update $\Delta_k \rightarrow \Delta_{k+1}$ depending on $\rho_k$ and $\lVert s_k \rVert_2$.
 \end{frame}
 
 \section{RTR-SR1 Method}
 
 \begin{frame}{Tangent Spaces}
-    \vspace{-1\baselineskip}\hfill{\tiny{[Absil, Mahony, Sepulchre, 2008]}}
+    \vspace{-0.5\baselineskip}\hfill{\tiny{[Absil, Mahony, Sepulchre, 2008]}}
     \begin{center}
         \includegraphics[width=5cm]{img/Riemannian_Metric.png}
     \end{center}
@@ -82,29 +82,29 @@
 \end{frame}
 
 \begin{frame}{Retractions}
-    \vspace{-1\baselineskip}\hfill{\tiny{[Absil, Mahony, Sepulchre, 2008]}}
+    \vspace{-0.5\baselineskip}\hfill{\tiny{[Absil, Mahony, Sepulchre, 2008]}}
     \begin{center}
         \includegraphics[width=5cm]{img/Retraction.png}
     \end{center}
     A \textbf{Retraction} is a continuously differentiable map $R \colon \tangent{} \to \mathcal{M}$, which satisfies \\[-0.1\baselineskip]
     \begin{itemize}
         \item $R_x (0_x) = x$ and
-        \item $\mathrm{D} \, R_x (0_x)[\xi_x] = \xi_x,$ for all $\xi_x \in \tangent{x}$
+        \item $\mathrm{D} \, R_x (0_x)[\xi_x] = \xi_x,$ for all $\xi_x \in \tangent{x}$.
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Riemannian Quadratic Model}
+\begin{frame}{Riemannian Trust-Region Methods}
     \begin{align*}
-        \alert{m_k}(\eta) = f(x_k) + g_{x_k}(\operatorname{grad} & f(x_k), \eta) + \frac{1}{2} g_{x_k}(\eta, \textcolor{red}{\mathcal{H}_k} [\eta]) \\
-        \text{Step: } \alert{\tangent{x_k} \ni \eta_k} & = \arg \min_{\alert{\lVert} \eta \alert{\rVert_{x_k}} \leq \Delta_k} m_k(\eta) \\
-        \text{Candidate: } \widetilde{x}_{k+1} & = \alert{R_{x_k}(\eta_k)}
-    \end{align*} \\[0.5\baselineskip]
+        \alert{m_k(} s \alert{)} = f(x_k) + \alert{g_{x_k}(\operatorname{grad}} & \alert{f(x_k),} s \alert{)} + \frac{1}{2} \alert{g_{x_k}(} s \alert{,} \textcolor{red}{\mathcal{H}_k [} s \textcolor{red}{]} \alert{)} \\
+        \text{Step: } \alert{\tangent{x_k} \ni s_k} & = \arg \min_{\alert{\lVert} s \alert{\rVert_{x_k}} \leq \Delta_k} \alert{m_k(} s \alert{)} \\
+        \text{Candidate: } \widetilde{x}_{k+1} & = \alert{R_{x_k}(s_k)}
+    \end{align*} \\[0.3\baselineskip]
     \textbf{TR Newton Method}: \\
-    $\mathcal{H}_k = \operatorname{Hess} f(x_k) \colon \tangent{x_k} \ni \eta_{x_k} \mapsto \nabla_{\eta_{x_k}} \operatorname{grad} f(x_k) \in \tangent{x_k}$. \\[0.5\baselineskip]
+    $\mathcal{H}_k = \operatorname{Hess} f(x_k) \colon \tangent{x_k} \ni \xi_{x_k} \mapsto \nabla_{\xi_{x_k}} \operatorname{grad} f(x_k) \in \tangent{x_k}$. \\[0.3\baselineskip]
 	\textbf{TR SR1 Method}: \\
-    $\mathcal{H}_k = \mathcal{H}^{SR1}_k \approx \operatorname{Hess} f(x_k)$. \\[-0.1\baselineskip]
+    $\mathcal{H}_k = \mathcal{H}^{SR1}_k \approx \operatorname{Hess} f(x_k)$.
     \begin{itemize}
-        \item $\mathcal{H}^{SR1}_k \rightarrow \widetilde{\mathcal{H}}^{SR1}_{k+1} \colon \textcolor{red}{\tangent{x_k}} \to \textcolor{red}{\tangent{x_k}}$ using $\eta_k \in \tangent{x_k}$ and $\operatorname{grad}f(\widetilde{x}_{k+1}) \in \textcolor{red}{\tangent{\widetilde{x}_{k+1}}}$.
+        \item $\mathcal{H}^{SR1}_k \rightarrow \widetilde{\mathcal{H}}^{SR1}_{k+1} \colon \textcolor{red}{\tangent{x_k}} \to \textcolor{red}{\tangent{x_k}}$ using $s_k \in \tangent{x_k}$ and $\operatorname{grad}f(\widetilde{x}_{k+1}) \in \textcolor{red}{\tangent{\widetilde{x}_{k+1}}}$.
         \item $\widetilde{\mathcal{H}}^{SR1}_{k+1} \rightarrow \mathcal{H}^{SR1}_{k+1} \colon \textcolor{red}{\tangent{x_{k+1}}} \to \textcolor{red}{\tangent{x_{k+1}}}$.
     \end{itemize}
 \end{frame}
@@ -120,16 +120,16 @@
 
 % The link to the Euclidean variant must still be found, in which it is made clear that eta_k generalizes the distance between x_k and x_k+1. Maybe another slide.
 \begin{frame}{Symmetric Rank One Update}
-    We set
+    We have
     \begin{align*}
-        & s_k = \eta_k \in \tangent{x_k} \quad (\widetilde{x}_{k+1} = R_{x_k}(\eta_k))\\
-        & y_k = {T^{S}_{x_k, \eta_k}}^{-1} ( \operatorname{grad}f(\widetilde{x}_{k+1}) ) - \operatorname{grad}f(x_k) \in \tangent{x_k}.
+        & s_k \in \tangent{x_k} \quad (\widetilde{x}_{k+1} = R_{x_k}(s_k) \text{ generalizes } \widetilde{x}_{k+1} = x_k + s_k) \\
+        & y_k = \alert{{T^{S}_{x_k, s_k}}^{-1} (} \operatorname{grad}f(\widetilde{x}_{k+1}) \alert{)} - \operatorname{grad}f(x_k) \in \tangent{x_k}.
     \end{align*}
-    If 
+    If
     \begin{equation*}
         \lvert g_{x_k}(s_k, y_k - \mathcal{H}^{SR1}_k[s_k]) \rvert \geq \nu \; \lVert s_k \rVert_{x_k} \lVert y_k - \mathcal{H}^{SR1}_k[s_k] \rVert_{x_k},
     \end{equation*}
-    where $\nu \in (0,1)$, then
+    where $\nu \in (0,1)$ (e.g. $\nu = 10^{-8}$), then
     \begin{equation*}
         \widetilde{\mathcal{H}}^{SR1}_{k+1} [\cdot] = \mathcal{H}^{SR1}_k [\cdot] + \frac{(y_k - \mathcal{H}^{SR1}_k [s_k]) (y_k - \mathcal{H}^{SR1}_k [s_k])^{\flat} [\cdot] }{(y_k - \mathcal{H}^{SR1}_k [s_k])^{\flat} [s_k]},
     \end{equation*}
@@ -137,13 +137,14 @@
 \end{frame}
 
 \begin{frame}{RTR-SR1 Method}
-    Do until converged:
+    While not converged, do... 
+
     \begin{enumerate}
-        \item Create quadratic local model $m_k(\eta)$ with $\mathcal{H}^{SR1}_k$. \\[0.2\baselineskip]
-        \item Obtain $\eta_k$ by (approximately) solving $m_k(\eta)$. \\[0.2\baselineskip]
-        \item Define $s_k, \ y_k$ and update $\mathcal{H}^{SR1}_k \rightarrow \widetilde{\mathcal{H}}^{SR1}_{k+1}$ if $\lvert g_{x_k}(s_k, y_k - \mathcal{H}_k[s_k]) \rvert \geq \nu \; \lVert s_k \rVert_{x_k} \lVert y_k - \mathcal{H}_k[s_k] \rVert_{x_k}$. \\[0.2\baselineskip]
-        \item If $\frac{f(x_k) - f(\widetilde{x}_{k+1})}{m_k(0) - m_k(s_k)} > \rho^{\prime}$ set $x_{k+1} = \widetilde{x}_{k+1} = R_{x_k}(\eta_k)$ and $\mathcal{H}^{SR1}_{k+1} = T^{S}_{x_k, \eta_k} \circ \widetilde{\mathcal{H}}^{SR1}_{k+1} \circ  {T^{S}_{x_k, \eta_k}}^{-1}$, else $x_{k+1} = x_k$ and $\mathcal{H}^{SR1}_{k+1} = \widetilde{\mathcal{H}}^{SR1}_{k+1}$.\\[0.2\baselineskip]
+        \item Obtain $s_k$ by (approximately) solving $m_k(s)$ with $\mathcal{H}_k = \mathcal{H}^{SR1}_k$.
+        \item Set $\widetilde{x}_{k+1} = R_{x_k}(s_k)$, define $y_k$ and update $\mathcal{H}^{SR1}_k \rightarrow \widetilde{\mathcal{H}}^{SR1}_{k+1}$ if $\lvert g_{x_k}(s_k, y_k - \mathcal{H}_k[s_k]) \rvert \geq \nu \; \lVert s_k \rVert_{x_k} \lVert y_k - \mathcal{H}_k[s_k] \rVert_{x_k}$, else $\widetilde{\mathcal{H}}^{SR1}_{k+1} = \mathcal{H}^{SR1}_{k+1}$. Compute $\rho_k$.
+        \item If $\rho_k > \rho^{\prime}$ set $x_{k+1} = \widetilde{x}_{k+1}$ and $\mathcal{H}^{SR1}_{k+1} = T^{S}_{x_k, s_k} \circ \widetilde{\mathcal{H}}^{SR1}_{k+1} \circ  {T^{S}_{x_k, s_k}}^{-1}$ else $x_{k+1} = x_k$ and $\mathcal{H}^{SR1}_{k+1} = \widetilde{\mathcal{H}}^{SR1}_{k+1}$.
         \item Update trust-region radius $\Delta_k \rightarrow \Delta_{k+1}$.
+        \item $k = k+1$.
     \end{enumerate}
 \end{frame}
 
@@ -208,7 +209,8 @@
 
 \begin{frame}{Conclusion}
     \begin{itemize}
-        \item Global convergence
+        \item RTR-SR1 method is generalized to Riemannian manifolds.
+        \item SR1 and BFGS approximations are implemented in Manopt.jl.
     \end{itemize}
     \begin{center}
         Thank you for your attention! Questions? 
