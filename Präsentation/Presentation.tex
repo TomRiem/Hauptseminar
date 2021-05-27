@@ -106,7 +106,8 @@
 	\textbf{TR SR1 Method}: \\
     $\mathcal{H}_k = \mathcal{H}^{SR1}_k \approx \operatorname{Hess} f(x_k)$.
     \begin{itemize}
-        \item $\mathcal{H}^{SR1}_k \rightarrow \widetilde{\mathcal{H}}^{SR1}_{k+1} \colon \textcolor{presentationblue}{\tangent{x_k}} \to \textcolor{presentationblue}{\tangent{x_k}}$ using $s_k \in \tangent{x_k}$ and $\operatorname{grad}f(\widetilde{x}_{k+1}) \in \textcolor{presentationblue}{\tangent{\widetilde{x}_{k+1}}}$.
+        \item $\mathcal{H}^{SR1}_k \rightarrow \widetilde{\mathcal{H}}^{SR1}_{k+1} \colon \textcolor{presentationblue}{\tangent{x_k}} \to \textcolor{presentationblue}{\tangent{x_k}}$ \\
+        using $s_k \in \tangent{x_k}$ and $\operatorname{grad}f(\widetilde{x}_{k+1}) \in \textcolor{presentationblue}{\tangent{\widetilde{x}_{k+1}}}$.
         \item $\widetilde{\mathcal{H}}^{SR1}_{k+1} \rightarrow \mathcal{H}^{SR1}_{k+1} \colon \textcolor{presentationblue}{\tangent{x_{k+1}}} \to \textcolor{presentationblue}{\tangent{x_{k+1}}}$.
     \end{itemize}
 \end{frame}
@@ -145,14 +146,14 @@
         \item Obtain $s_k$ by (approximately) solving $m_k(s)$ with $\mathcal{H}_k = \mathcal{H}^{SR1}_k$.
         \item Set $\widetilde{x}_{k+1} = R_{x_k}(s_k)$, compute $y_k$.
         \item If $\lvert g_{x_k}(s_k, y_k - \mathcal{H}_k[s_k]) \rvert \geq \nu \; \lVert s_k \rVert_{x_k} \lVert y_k - \mathcal{H}_k[s_k] \rVert_{x_k}$ \\
-        Update $\mathcal{H}^{SR1}_k \rightarrow \widetilde{\mathcal{H}}^{SR1}_{k+1}$, \\
+        \hspace{10mm} Update $\mathcal{H}^{SR1}_k \rightarrow \widetilde{\mathcal{H}}^{SR1}_{k+1}$, \\
         Else \\
-        $\widetilde{\mathcal{H}}^{SR1}_{k+1} = \mathcal{H}^{SR1}_{k}$. 
+        \hspace{10mm} $\widetilde{\mathcal{H}}^{SR1}_{k+1} = \mathcal{H}^{SR1}_{k}$. 
         \item Compute $\rho_k$.
         \item If $\rho_k > \rho^{\prime}$ \\
-        Set $x_{k+1} = \widetilde{x}_{k+1}$ and $\mathcal{H}^{SR1}_{k+1} = T^{S}_{x_k, s_k} \circ \widetilde{\mathcal{H}}^{SR1}_{k+1} \circ  {T^{S}_{x_k, s_k}}^{-1}$ \\
+        \hspace{10mm} Set $x_{k+1} = \widetilde{x}_{k+1}$ and $\mathcal{H}^{SR1}_{k+1} = T^{S}_{x_k, s_k} \circ \widetilde{\mathcal{H}}^{SR1}_{k+1} \circ  {T^{S}_{x_k, s_k}}^{-1}$ \\
         Else \\
-        $x_{k+1} = x_k$ and $\mathcal{H}^{SR1}_{k+1} = \widetilde{\mathcal{H}}^{SR1}_{k+1}$.
+        \hspace{10mm} $x_{k+1} = x_k$ and $\mathcal{H}^{SR1}_{k+1} = \widetilde{\mathcal{H}}^{SR1}_{k+1}$.
         \item Update trust-region radius $\Delta_k \rightarrow \Delta_{k+1}$.
         \item $k = k+1$.
     \end{enumerate}
@@ -171,25 +172,14 @@
 \section{Numerics}
 
 \begin{frame}{Rayleigh Quotient Minimization}
-    $A \in \mathbb{R}^{n \times n}$ symmetric, eigenvector $v \in \mathbb{R}^n$ to the smallest eigenvalue defines the two global minima $\pm v$
-    \begin{equation*}
-        \begin{split}
-            f \colon \; \mathbb{S}^{n-1} & \to \mathbb{R} \\
-            x & \mapsto x^{\mathrm{T}} A x
-        \end{split}
-    \end{equation*} \\[-0.5\baselineskip]
-    \begin{equation*}
-        \operatorname{grad} f(x) = 2(Ax - x x^{\mathrm{T}} A x)
-    \end{equation*}
-    \begin{equation*}
-        \operatorname{Hess} f(x) [\xi_x] = 2 (A \xi_x - x x^{\mathrm{T}} A \xi_x - \xi_x x^{\mathrm{T}} A x - x x^{\mathrm{T}} \xi_x x^{\mathrm{T}} A x)
-    \end{equation*}
-    \begin{equation*}
-        R_x (\xi_x) = \frac{x + \xi_x}{\lVert x + \xi_x \rVert_2}
-    \end{equation*}
-    \begin{equation*}
-        T_{x, \eta_x}(\xi_x) = \xi_x - \frac{2 y^{\mathrm{T}} \xi_x}{\lVert x + y \rVert^{2}_2} (x + y)
-    \end{equation*}
+    $A \in \mathbb{R}^{n \times n}$ symmetric, eigenvector $v \in \mathbb{R}^n$ to the smallest eigenvalue defines the two global minima $\pm v$ of the
+    \begin{itemize}
+        \item Rayleigh Quotient: $f \colon \; \mathbb{S}^{n-1} \to \mathbb{R}, \; x \mapsto x^{\mathrm{T}} A x$.
+        \item $\operatorname{grad} f(x) = 2(Ax - x x^{\mathrm{T}} A x)$.
+        \item $\operatorname{Hess} f(x) [\xi_x] = 2 (A \xi_x - x x^{\mathrm{T}} A \xi_x - \xi_x x^{\mathrm{T}} A x - x x^{\mathrm{T}} \xi_x x^{\mathrm{T}} A x)$
+        \item Retraction by Projection: $R_x (\xi_x) = \frac{x + \xi_x}{\lVert x + \xi_x \rVert_2}$.
+        \item Parallel Transport: $T_{x, \eta_x}(\xi_x) = \xi_x - \frac{2 y^{\mathrm{T}} \xi_x}{\lVert x + y \rVert^{2}_2} (x + y), \; y = R_x(\eta_x)$.
+    \end{itemize}
 \end{frame}
 
 \begin{frame}{Experiment}
