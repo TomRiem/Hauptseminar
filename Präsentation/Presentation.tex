@@ -94,6 +94,7 @@
         \item $R_x (0_x) = x$ and
         \item $\mathrm{D} \, R_x (0_x)[\xi_x] = \xi_x,$ for all $\xi_x \in \tangent{x}$.
     \end{itemize}
+    $\Rightarrow$ \textbf{Pullback} $\hat{f}_x = f \circ R_x \colon \tangent{x} \to \mathbb{R}$.
 \end{frame}
 
 \begin{frame}{Riemannian Trust-Region Methods}
@@ -108,7 +109,7 @@
     $\mathcal{H}_k = \mathcal{H}^{SR1}_k \approx \operatorname{Hess} f(x_k)$.
     \begin{itemize}
         \item $\mathcal{H}^{SR1}_k \rightarrow \widetilde{\mathcal{H}}^{SR1}_{k+1} \colon \textcolor{presentationblue}{\tangent{x_k}} \to \textcolor{presentationblue}{\tangent{x_k}}$ \\
-        using $s_k \in \tangent{x_k}$ and $\operatorname{grad}f(\widetilde{x}_{k+1}) \in \textcolor{presentationblue}{\tangent{\widetilde{x}_{k+1}}}$.
+        using $s_k \in \textcolor{presentationblue}{\tangent{x_k}}$ and $\operatorname{grad}f(\widetilde{x}_{k+1}) \in \textcolor{presentationblue}{\tangent{\widetilde{x}_{k+1}}}$.
         \item $\widetilde{\mathcal{H}}^{SR1}_{k+1} \rightarrow \mathcal{H}^{SR1}_{k+1} \colon \textcolor{presentationblue}{\tangent{x_{k+1}}} \to \textcolor{presentationblue}{\tangent{x_{k+1}}}$.
     \end{itemize}
 \end{frame}
@@ -124,7 +125,7 @@
 
 % The link to the Euclidean variant must still be found, in which it is made clear that eta_k generalizes the distance between x_k and x_k+1. Maybe another slide.
 \begin{frame}{Symmetric Rank One Update}
-    We have
+    Let $\nu \in (0,1)$ (e.g. $\nu = 10^{-8}$). We have
     \begin{align*}
         & s_k \in \tangent{x_k} \quad (\widetilde{x}_{k+1} = R_{x_k}(s_k) \text{ generalizes } \widetilde{x}_{k+1} = x_k + s_k) \\
         & y_k = \alert{{T^{S}_{x_k, s_k}}^{-1} (} \operatorname{grad}f(\widetilde{x}_{k+1}) \alert{)} - \operatorname{grad}f(x_k) \in \tangent{x_k}.
@@ -133,12 +134,17 @@
     \begin{equation*}
         \lvert g_{x_k}(s_k, y_k - \mathcal{H}^{SR1}_k[s_k]) \rvert \geq \nu \; \lVert s_k \rVert_{x_k} \lVert y_k - \mathcal{H}^{SR1}_k[s_k] \rVert_{x_k},
     \end{equation*}
-    where $\nu \in (0,1)$ (e.g. $\nu = 10^{-8}$), then
+    then
     \begin{equation*}
         \widetilde{\mathcal{H}}^{SR1}_{k+1} [\cdot] = \mathcal{H}^{SR1}_k [\cdot] + \frac{(y_k - \mathcal{H}^{SR1}_k [s_k]) (y_k - \mathcal{H}^{SR1}_k [s_k])^{\flat} [\cdot] }{(y_k - \mathcal{H}^{SR1}_k [s_k])^{\flat} [s_k]},
     \end{equation*}
-    where $\xi^{\flat}_{x_k} \colon \tangent{x_k} \ni \zeta_{x_k} \mapsto g_{x_k}(\xi_{x_k}, \zeta_{x_k}),$ for all $\xi_{x_k} \in \tangent{x_k}$. \\
-    Else $\widetilde{\mathcal{H}}^{SR1}_{k+1} [\cdot] = \mathcal{H}^{SR1}_k [\cdot]$. In both cases: $\widetilde{\mathcal{H}}^{SR1}_{k+1} [s_k] = y_k$.
+    % where $\xi^{\flat}_{x_k} \colon \tangent{x_k} \ni \zeta_{x_k} \mapsto g_{x_k}(\xi_{x_k}, \zeta_{x_k}),$ for all $\xi_{x_k} \in \tangent{x_k}$. \\
+    Else 
+    \begin{equation*}
+        \widetilde{\mathcal{H}}^{SR1}_{k+1} [\cdot] = \mathcal{H}^{SR1}_k [\cdot].
+    \end{equation*}
+    % $\widetilde{\mathcal{H}}^{SR1}_{k+1} [\cdot] = \mathcal{H}^{SR1}_k [\cdot]$. 
+    % In both cases: $\widetilde{\mathcal{H}}^{SR1}_{k+1} [s_k] = y_k$.
 \end{frame}
 
 \begin{frame}{RTR-SR1 Method}
@@ -185,21 +191,21 @@
 \end{frame}
 
 \begin{frame}{Experiment}
-    Julia Code
+    Julia Code % lstinput
 \end{frame}
 
 \begin{frame}{Results}
     Comparison of ... in an average of 10 random runs:
     \begin{table}[H]
         \resizebox{\textwidth}{!}{
-            \begin{tabular}{lccccccccc}
+            \begin{tabular}{lcccccc}
                 \toprule
-                Manifold & \multicolumn{3}{c}{$\mathbb{S}^{49}$}& \multicolumn{3}{c}{$\mathbb{S}^{99}$} & \multicolumn{3}{c}{$\mathbb{S}^{199}$}\\ 
-                \cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-10}
-                Quadratic term & Newton & SR1 & BFGS & Newton & SR1 & BFGS & Newton & SR1 & BFGS \\ 
+                Manifold & \multicolumn{2}{c}{$\mathbb{S}^{49}$}& \multicolumn{2}{c}{$\mathbb{S}^{99}$} & \multicolumn{2}{c}{$\mathbb{S}^{199}$}\\ 
+                \cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7}
+                Quadratic term & Newton & SR1 & Newton & SR1 & Newton & SR1 \\ 
 
-                Time in seconds & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$\\ 
-                Iterations & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ & $0$ \\
+                Time in ms & $0$ & $0$ & $0$ & $0$ & $0$ & $0$\\ 
+                Iterations & $9.2$ & $41.5$ & $10.2$ & $70.1$ & $10.5$ & $83.1$ \\
                 \bottomrule
             \end{tabular}
         }
@@ -211,11 +217,11 @@
 \begin{frame}{Conclusion}
     \begin{itemize}
         \item RTR-SR1 method is generalized to Riemannian manifolds.
-        \item SR1 and BFGS approximations are implemented in Manopt.jl.
-        \item Looking forward to implement limited-memory variant.
+        \item SR1 approximation is implemented in Manopt.jl.
+        \item Next step: Implementing limited-memory variant.
     \end{itemize}
     \begin{center}
-        Thank you for your attention! Questions? 
+        Thank you for your attention! 
     \end{center}
 \end{frame}
 
