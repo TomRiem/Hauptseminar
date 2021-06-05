@@ -15,24 +15,44 @@ To apply the RSR1 method, implemented in \lstinline!Manopt.jl!, to the optimizat
 \begin{lstlisting}[caption={The Rayleigh quotient minimization experiment in Julia for $n = 100$.}, label={RayleighCode}]
     using Manopt, Manifolds, Random
     Random.seed!(42)
-    n = 100
+    n = 50
     A = randn(n,n)
-    A_symm = ( A + A' ) / 2
+    A = ( A + A' ) / 2
+    F(::Sphere, p::Array{Float64,1}) = p' * A * p
+    gradF(::Sphere, p::Array{Float64,1}) = 2 * (A * p - p * p' * A * p)
+    HessF(::Sphere, p::Array{Float64,1}, X::Array{Float64,1}) = 2 * (A * X - p * p' * A * X - X * p' * A * p - p * p' * X * p' * A * p)
     M = Sphere(n - 1)
-    F(X::Array{Float64,1}) = X' * A_symm * X
-    grad_F(X::Array{Float64,1}) = 2 * ( A_symm * X - X * X' * A_symm * X )
     x = random_point(M)
-    
-    quasi_Newton(M, 
-        F, 
-        grad_F, 
-        x; 
-        memory_size = -1, 
-        direction_update = SR1(),
-        stopping_criterion = StopWhenAny(
-            StopAfterIteration(max(1000)),
-            StopWhenGradientNormLess(10^(-6)),
-        )
+    trust_regions!(
+    M,
+    F,
+    gradF,
+    ApproxHessianSymmetricRankOne(M, x, gradF; nu = sqrt(eps(Float64))),
+    x;
+    stopping_criterion=StopWhenAny(
+    StopAfterIteration(500), StopWhenGradientNormLess(10^(-6))
+    ),
+    retraction_method=ProjectionRetraction(),
+    trust_region_radius=1.0
+    )
+\end{lstlisting}
+\begin{lstlisting}
+    using Manopt, Manifolds, Random
+    Random.seed!(42)
+    n = 50
+    A = randn(n,n)
+    A = ( A + A' ) / 2
+    F(::Sphere, p::Array{Float64,1}) = p' * A * p
+    gradF(::Sphere, p::Array{Float64,1}) = 2 * (A * p - p * p' * A * p)
+    M = Sphere(n - 1)
+    x = random_point(M)
+
+    trust_regions!(M, F, gradF,
+    ApproxHessianSymmetricRankOne(M, x, gradF; nu=sqrt(eps(Float64))),
+    x; stopping_criterion=StopWhenAny(
+    StopAfterIteration(500), StopWhenGradientNormLess(10^(-6))
+    ), retraction_method=ProjectionRetraction(),
+    trust_region_radius=1.0)
 \end{lstlisting}
 To test the performance, we execute an experiment in Julia, where \cref{RayleighCode} depending on the parameter \lstinline!n! is used. We compare the average number of iterations per call and the average time needed per call of the RSR1, the inverse RSR1, the RBFGS and the inverse RBFGS method, which are all implemented in the package \lstinline!Manopt.jl!. All methods follow the sequence of \cref{RiemannianSR1Method}, only at the end the corresponding operator update of the method is used, i.e. the RBFGS method uses \cref{directRiemannianBFGSFormula}, the inverse RBFGS method uses \cref{RiemannianInverseBFGSFormula}, the RSR1 method uses \cref{RiemannianDirectSR1formula} and the inverse RSR1 method uses \cref{RiemannianInverseSR1formula}. In all methods, a stepsize $\alpha_k > 0$ is determined in each iteration that fulfills \cref{RiemannianWolfeConditions1} and \cref{RiemannianWolfeConditions2.2}, with $c_1 = 10^{−4}$ and $c_2 = 0.999$. The numerical experiment is implemented in the toolbox \lstinline!Manopt.jl!. It runs on a Lenovo ThinkPad L490, 64 bit Windows system, 1.8 Ghz Intel Core i7-8565U, 32 GB RAM, with Julia 1.5.2.
 \begin{table}[H]\label{tab:Results}

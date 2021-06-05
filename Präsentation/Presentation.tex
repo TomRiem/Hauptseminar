@@ -56,7 +56,7 @@
 \begin{frame}{Euclidean Trust-Region Methods}
     \alert{Quadratic model} at current iterate:
 	\begin{equation*}
-    	m_k(s) = f(x_k) + {\nabla f(x_k)}^{\mathrm{T}} s + \frac{1}{2} s^{\mathrm{T}} H_k s.
+    	m_k(s) = f(x_k) + \alert{\nabla f(x_k)}^{\mathrm{T}} s + \frac{1}{2} s^{\mathrm{T}} H_k s.
     \end{equation*}
 	Finding a \alert{step} (e.g. with tCG):
 	\begin{equation*}
@@ -87,31 +87,30 @@
 \begin{frame}{Retractions}
     \vspace{-0.5\baselineskip}\hfill{\tiny{[Absil, Mahony, Sepulchre, 2008]}}
     \begin{center}
-        \includegraphics[width=5cm]{img/Retraction.png}
+        \includegraphics[width=4cm]{img/Retraction.png}
     \end{center}
-    A \textbf{Retraction} is a continuously differentiable map $R \colon \tangent{} \to \mathcal{M}$, which satisfies \\[-0.1\baselineskip]
+    A \textbf{Retraction} is a smooth map $R_x \colon \tangent{x} \to \mathcal{M}$, which satisfies \\[-0.1\baselineskip]
     \begin{itemize}
         \item $R_x (0_x) = x$ and
         \item $\mathrm{D} \, R_x (0_x)[\xi_x] = \xi_x,$ for all $\xi_x \in \tangent{x}$.
     \end{itemize}
-    $\Rightarrow$ \textbf{Pullback} $\hat{f}_x = f \circ R_x \colon \tangent{x} \to \mathbb{R}$.
+    \textbf{Pullback} $\widehat{f}_x = f \circ R_x \colon \tangent{x} \to \mathbb{R}$, \\
+    $\operatorname{grad} \widehat{f}_x (0_x) = \operatorname{grad} f(x)$ for all $x \in \mathcal{M}$.
 \end{frame}
 
 \begin{frame}{Riemannian Trust-Region Methods}
     \begin{align*}
-        \alert{m_k(} s \alert{)} = f(x_k) + \alert{g_{x_k}(\operatorname{grad}} & \alert{f(x_k),} s \alert{)} + \frac{1}{2} \alert{g_{x_k}(} s \alert{,} \textcolor{presentationblue}{\mathcal{H}_k [} s \textcolor{presentationblue}{]} \alert{)} \\
-        \text{Step: } \alert{\tangent{x_k} \ni s_k} & = \arg \min_{\alert{\lVert} s \alert{\rVert_{x_k}} \leq \Delta_k} \alert{m_k(} s \alert{)} \\
-        \text{Candidate: } \widetilde{x}_{k+1} & = \alert{R_{x_k}(s_k)}
-    \end{align*} \\[0.3\baselineskip]
+        m_k( s ) & = \widehat{f}_{x_k}(0_{x_k}) + g_{x_k}(\operatorname{grad} \widehat{f}_{x_k}(0_{x_k}), s ) + \frac{1}{2} g_{x_k}( s , \alert{\mathcal{H}_k [} s \alert{]} ) \\
+        & = f(x_k) + g_{x_k}(\operatorname{grad} f(x_k), s ) + \frac{1}{2} g_{x_k}( s , \alert{\mathcal{H}_k [} s \alert{]} ) \\
+        & \text{Step: } \tangent{x_k} \ni s_k = \arg \min_{\lVert s \rVert_{x_k} \leq \Delta_k} m_k( s ) \\
+        & \text{Candidate: } \widetilde{x}_{k+1} = R_{x_k}(s_k)
+    \end{align*} \\[0.2\baselineskip]
     \textbf{TR Newton Method}: \\
-    $\mathcal{H}_k = \operatorname{Hess} f(x_k) \colon \tangent{x_k} \ni \xi_{x_k} \mapsto \nabla_{\xi_{x_k}} \operatorname{grad} f(x_k) \in \tangent{x_k}$. \\[0.3\baselineskip]
+    $\mathcal{H}_k = \operatorname{Hess} f(x_k) \colon \tangent{x_k} \ni \xi_{x_k} \mapsto \nabla_{\xi_{x_k}} \operatorname{grad} f(x_k) \in \tangent{x_k}$. \\[0.2\baselineskip]
 	\textbf{TR SR1 Method}: \\
-    $\mathcal{H}_k = \mathcal{H}^{SR1}_k \approx \operatorname{Hess} f(x_k)$.
-    \begin{itemize}
-        \item $\mathcal{H}^{SR1}_k \rightarrow \widetilde{\mathcal{H}}^{SR1}_{k+1} \colon \textcolor{presentationblue}{\tangent{x_k}} \to \textcolor{presentationblue}{\tangent{x_k}}$ \\
-        using $s_k \in \textcolor{presentationblue}{\tangent{x_k}}$ and $\operatorname{grad}f(\widetilde{x}_{k+1}) \in \textcolor{presentationblue}{\tangent{\widetilde{x}_{k+1}}}$.
-        \item $\widetilde{\mathcal{H}}^{SR1}_{k+1} \rightarrow \mathcal{H}^{SR1}_{k+1} \colon \textcolor{presentationblue}{\tangent{x_{k+1}}} \to \textcolor{presentationblue}{\tangent{x_{k+1}}}$.
-    \end{itemize}
+    $\mathcal{H}_k = \mathcal{H}^{SR1}_k \approx \operatorname{Hess} f(x_k)$. \\
+    $\widetilde{\mathcal{H}}^{SR1}_{k+1} \rightarrow \mathcal{H}^{SR1}_{k+1} \colon \alert{\tangent{x_{k+1}}} \to \alert{\tangent{x_{k+1}}}$ \\
+    using $s_k, \operatorname{grad} f(x_k) \in \alert{\tangent{x_k}}$ and $\operatorname{grad}f(\widetilde{x}_{k+1}) \in \alert{\tangent{\widetilde{x}_{k+1}}}$.
 \end{frame}
 
 \begin{frame}{Vector Transports}
@@ -191,7 +190,9 @@
 \end{frame}
 
 \begin{frame}{Experiment}
-    Julia Code % lstinput
+    \begin{center}
+        \includegraphics[width=11cm]{img/Rayleigh_Experiment_2.png}
+    \end{center}
 \end{frame}
 
 \begin{frame}{Results}
@@ -220,6 +221,7 @@
         \item SR1 approximation is implemented in Manopt.jl.
         \item Next step: Implementing limited-memory variant.
     \end{itemize}
+    \vspace{10mm}
     \begin{center}
         Thank you for your attention! 
     \end{center}
