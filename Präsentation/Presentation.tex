@@ -99,17 +99,18 @@
 \end{frame}
 
 \begin{frame}{Riemannian Trust-Region Methods}
+    \vspace{-1.5\baselineskip}
     \begin{align*}
         m_k( s ) & = \widehat{f}_{x_k}(0_{x_k}) + g_{x_k}(\operatorname{grad} \widehat{f}_{x_k}(0_{x_k}), s ) + \frac{1}{2} g_{x_k}( s , \alert{\mathcal{H}_k [} s \alert{]} ) \\
         & = f(x_k) + g_{x_k}(\operatorname{grad} f(x_k), s ) + \frac{1}{2} g_{x_k}( s , \alert{\mathcal{H}_k [} s \alert{]} ) \\
         & \text{Step: } \tangent{x_k} \ni s_k = \arg \min_{\lVert s \rVert_{x_k} \leq \Delta_k} m_k( s ) \\
         & \text{Candidate: } \widetilde{x}_{k+1} = R_{x_k}(s_k)
-    \end{align*} \\[0.2\baselineskip]
+    \end{align*}
     \textbf{TR Newton Method}: \\
     $\mathcal{H}_k = \operatorname{Hess} f(x_k) \colon \tangent{x_k} \ni \xi_{x_k} \mapsto \nabla_{\xi_{x_k}} \operatorname{grad} f(x_k) \in \tangent{x_k}$. \\[0.2\baselineskip]
 	\textbf{TR SR1 Method}: \\
     $\mathcal{H}_k = \mathcal{H}^{SR1}_k \approx \operatorname{Hess} f(x_k)$. \\
-    $\widetilde{\mathcal{H}}^{SR1}_{k+1} \rightarrow \mathcal{H}^{SR1}_{k+1} \colon \alert{\tangent{x_{k+1}}} \to \alert{\tangent{x_{k+1}}}$ \\
+    $\mathcal{H}^{SR1}_k \rightarrow \mathcal{H}^{SR1}_{k+1} \colon \alert{\tangent{x_{k+1}}} \to \alert{\tangent{x_{k+1}}}$ \\
     using $s_k, \operatorname{grad} f(x_k) \in \alert{\tangent{x_k}}$ and $\operatorname{grad}f(\widetilde{x}_{k+1}) \in \alert{\tangent{\widetilde{x}_{k+1}}}$.
 \end{frame}
 
@@ -124,7 +125,7 @@
 
 % The link to the Euclidean variant must still be found, in which it is made clear that eta_k generalizes the distance between x_k and x_k+1. Maybe another slide.
 \begin{frame}{Symmetric Rank One Update}
-    Let $\nu \in (0,1)$ (e.g. $\nu = 10^{-8}$). We have
+    Let $\nu \in (0,1)$ (e.g. $\nu = 10^{-8}$), $\mathcal{H}^{SR1}_0 [\cdot] = id[\cdot]$. We have
     \begin{align*}
         & s_k \in \tangent{x_k} \quad (\widetilde{x}_{k+1} = R_{x_k}(s_k) \text{ generalizes } \widetilde{x}_{k+1} = x_k + s_k) \\
         & y_k = \alert{{T^{S}_{x_k, s_k}}^{-1} (} \operatorname{grad}f(\widetilde{x}_{k+1}) \alert{)} - \operatorname{grad}f(x_k) \in \tangent{x_k}.
