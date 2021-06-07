@@ -125,7 +125,7 @@
 
 % The link to the Euclidean variant must still be found, in which it is made clear that eta_k generalizes the distance between x_k and x_k+1. Maybe another slide.
 \begin{frame}{Symmetric Rank One Update}
-    Let $\nu \in (0,1)$ (e.g. $\nu = 10^{-8}$), $\mathcal{H}^{SR1}_0 [\cdot] = id[\cdot]$. We have
+    Let $\nu \in (0,1)$, $\mathcal{H}^{SR1}_0 [\cdot] = id_{\tangent{x_0}}[\cdot]$. We have
     \begin{align*}
         & s_k \in \tangent{x_k} \quad (\widetilde{x}_{k+1} = R_{x_k}(s_k) \text{ generalizes } \widetilde{x}_{k+1} = x_k + s_k) \\
         & y_k = \alert{{T^{S}_{x_k, s_k}}^{-1} (} \operatorname{grad}f(\widetilde{x}_{k+1}) \alert{)} - \operatorname{grad}f(x_k) \in \tangent{x_k}.
@@ -136,9 +136,10 @@
     \end{equation*}
     then
     \begin{equation*}
-        \widetilde{\mathcal{H}}^{SR1}_{k+1} [\cdot] = \mathcal{H}^{SR1}_k [\cdot] + \frac{(y_k - \mathcal{H}^{SR1}_k [s_k]) (y_k - \mathcal{H}^{SR1}_k [s_k])^{\flat} [\cdot] }{(y_k - \mathcal{H}^{SR1}_k [s_k])^{\flat} [s_k]},
+        \widetilde{\mathcal{H}}^{SR1}_{k+1} [\cdot] = \mathcal{H}^{SR1}_k [\cdot] + \frac{(y_k - \mathcal{H}^{SR1}_k [s_k]) (y_k - \mathcal{H}^{SR1}_k [s_k])^{\flat} [\cdot] }{(y_k - \mathcal{H}^{SR1}_k [s_k])^{\flat} [s_k]}
     \end{equation*}
     % where $\xi^{\flat}_{x_k} \colon \tangent{x_k} \ni \zeta_{x_k} \mapsto g_{x_k}(\xi_{x_k}, \zeta_{x_k}),$ for all $\xi_{x_k} \in \tangent{x_k}$. \\
+    (\textbf{Flat}: $\xi^{\flat}_{x_k} \colon \tangent{x_k} \ni \zeta_{x_k} \mapsto g_{x_k}(\xi_{x_k}, \zeta_{x_k}),$ for all $\xi_{x_k} \in \tangent{x_k}$), \\
     Else 
     \begin{equation*}
         \widetilde{\mathcal{H}}^{SR1}_{k+1} [\cdot] = \mathcal{H}^{SR1}_k [\cdot].
@@ -169,7 +170,7 @@
 
 \begin{frame}{Convergence}
     \vspace{-1\baselineskip}\hfill{\tiny{[Huang, 2011]}} \\[0.2\baselineskip]
-    Under reasonable assumptions (among others $f \in C^2$, bounded below on the sublevel set $\{ x \in \mathcal{M} \colon f(x) \leq f(x_0) \}$) we get 
+    Under reasonable assumptions we get 
     \begin{itemize}
         \item \alert{global covergence}, i.e. $\lim_{k \rightarrow \infty} \operatorname{grad} f(x_k) = 0$.
         \item if $\operatorname{Hess} f$ satisfies a Riemannian generalization of Lipschitz continuity around the minimizer $x^*$, then $\{ x_k \}_k$ converges to $x^*$ $\alert{n + 1}$\alert{-step superlinearly}, i.e. \begin{equation*}\lim_{k \rightarrow \infty} \frac{\operatorname{dist}(x_{k+n+1}, x^*)}{\operatorname{dist}(x_k, x^*)} = 0, \end{equation*} where $n$ is the dimension of the manifold.

@@ -92,9 +92,9 @@
 		\vspace{3cm}
 		\begin{center}
 			\vspace{1cm}
-			{\huge\@title{}}\\
+			{\LARGE\@title{}}\\
 			\vspace{1cm}
-			Computerpraktikum
+			Hauptseminar
 		\end{center}
 		\vfill
 		\begin{tabular}[b]{p{0.33\textwidth}l}
