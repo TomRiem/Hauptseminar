@@ -80,8 +80,8 @@
     \end{center}
     \textbf{Tangent space} $\tangent{x}$ at $x$ is the set of all tangent vectors (directions) at $x$. $\tangent{x}$ is a linear space. \\[0.2\baselineskip]
     \textbf{Riemannian metric} $g_{\cdot} (\cdot, \cdot)$ is a smoothly-varying inner product on the tangent spaces. Norm: $\lVert \xi_x \rVert_x = \sqrt{g_x(\xi_x, \xi_x)}$. \\[0.2\baselineskip]
-    \textbf{Riemannian gradient} $\mathrm{D} \, f(x) [\eta_x] = g_x (\operatorname{grad} f(x), \eta_x),$ \\
-    for all $\eta_x \in \tangent{x}$.
+    \textbf{Riemannian gradient} \\
+    $\mathrm{D} \, f(x) [\eta_x] = g_x (\operatorname{grad} f(x), \eta_x) = {\operatorname{grad} f(x)}^{\flat} [\eta_x]$ for all $\eta_x \in \tangent{x}$.
 \end{frame}
 
 \begin{frame}{Retractions}
@@ -94,23 +94,20 @@
         \item $R_x (0_x) = x$ and
         \item $\mathrm{D} \, R_x (0_x)[\xi_x] = \xi_x,$ for all $\xi_x \in \tangent{x}$.
     \end{itemize}
-    \textbf{Pullback} $\widehat{f}_x = f \circ R_x \colon \tangent{x} \to \mathbb{R}$, \\
-    $\operatorname{grad} \widehat{f}_x (0_x) = \operatorname{grad} f(x)$ for all $x \in \mathcal{M}$.
 \end{frame}
 
 \begin{frame}{Riemannian Trust-Region Methods}
     \vspace{-1.5\baselineskip}
     \begin{align*}
-        m_k( s ) & = \widehat{f}_{x_k}(0_{x_k}) + g_{x_k}(\operatorname{grad} \widehat{f}_{x_k}(0_{x_k}), s ) + \frac{1}{2} g_{x_k}( s , \alert{\mathcal{H}_k [} s \alert{]} ) \\
-        & = f(x_k) + g_{x_k}(\operatorname{grad} f(x_k), s ) + \frac{1}{2} g_{x_k}( s , \alert{\mathcal{H}_k [} s \alert{]} ) \\
+        m_k( s ) & = f(x_k) + g_{x_k}(\operatorname{grad} f(x_k), s ) + \frac{1}{2} g_{x_k}( s , \alert{\mathcal{H}_k [} s \alert{]} ) \\
         & \text{Step: } \tangent{x_k} \ni s_k = \arg \min_{\lVert s \rVert_{x_k} \leq \Delta_k} m_k( s ) \\
         & \text{Candidate: } \widetilde{x}_{k+1} = R_{x_k}(s_k)
-    \end{align*}
-    \textbf{TR Newton Method}: \\
-    $\mathcal{H}_k = \operatorname{Hess} f(x_k) \colon \tangent{x_k} \ni \xi_{x_k} \mapsto \nabla_{\xi_{x_k}} \operatorname{grad} f(x_k) \in \tangent{x_k}$. \\[0.2\baselineskip]
-	\textbf{TR SR1 Method}: \\
-    $\mathcal{H}_k = \mathcal{H}^{SR1}_k \approx \operatorname{Hess} f(x_k)$. \\
-    $\mathcal{H}^{SR1}_k \rightarrow \mathcal{H}^{SR1}_{k+1} \colon \alert{\tangent{x_{k+1}}} \to \alert{\tangent{x_{k+1}}}$ \\
+    \end{align*} \\[0.7\baselineskip]
+    \textbf{TR Newton Method}: \\[0.2\baselineskip]
+    $\mathcal{H}_k = \operatorname{Hess} f(x_k) \colon \tangent{x_k} \ni \xi_{x_k} \mapsto \nabla_{\xi_{x_k}} \operatorname{grad} f(x_k) \in \tangent{x_k}$. \\[0.7\baselineskip]
+	\textbf{TR SR1 Method}: \\[0.2\baselineskip]
+    $\mathcal{H}_k = \mathcal{H}^{SR1}_k \approx \operatorname{Hess} f(x_k)$. \\[0.2\baselineskip]
+    $\mathcal{H}^{SR1}_k \rightarrow \mathcal{H}^{SR1}_{k+1} \colon \alert{\tangent{x_{k+1}}} \to \alert{\tangent{x_{k+1}}}$ \\[0.2\baselineskip]
     using $s_k, \operatorname{grad} f(x_k) \in \alert{\tangent{x_k}}$ and $\operatorname{grad}f(\widetilde{x}_{k+1}) \in \alert{\tangent{\widetilde{x}_{k+1}}}$.
 \end{frame}
 
@@ -132,14 +129,13 @@
     \end{align*}
     If
     \begin{equation*}
-        \lvert g_{x_k}(s_k, y_k - \mathcal{H}^{SR1}_k[s_k]) \rvert \geq \nu \; \lVert s_k \rVert_{x_k} \lVert y_k - \mathcal{H}^{SR1}_k[s_k] \rVert_{x_k},
+        \lvert g_{x_k}(s_k, y_k - \mathcal{H}^{SR1}_k[s_k]) \rvert \geq \nu \; \lVert s_k \rVert_{x_k} \lVert y_k - \mathcal{H}^{SR1}_k[s_k] \rVert_{x_k}
     \end{equation*}
     then
     \begin{equation*}
-        \widetilde{\mathcal{H}}^{SR1}_{k+1} [\cdot] = \mathcal{H}^{SR1}_k [\cdot] + \frac{(y_k - \mathcal{H}^{SR1}_k [s_k]) (y_k - \mathcal{H}^{SR1}_k [s_k])^{\flat} [\cdot] }{(y_k - \mathcal{H}^{SR1}_k [s_k])^{\flat} [s_k]}
+        \widetilde{\mathcal{H}}^{SR1}_{k+1} [\cdot] = \mathcal{H}^{SR1}_k [\cdot] + \frac{(y_k - \mathcal{H}^{SR1}_k [s_k]) (y_k - \mathcal{H}^{SR1}_k [s_k])^{\flat} [\cdot] }{(y_k - \mathcal{H}^{SR1}_k [s_k])^{\flat} [s_k]},
     \end{equation*}
     % where $\xi^{\flat}_{x_k} \colon \tangent{x_k} \ni \zeta_{x_k} \mapsto g_{x_k}(\xi_{x_k}, \zeta_{x_k}),$ for all $\xi_{x_k} \in \tangent{x_k}$. \\
-    (\textbf{Flat}: $\xi^{\flat}_{x_k} \colon \tangent{x_k} \ni \zeta_{x_k} \mapsto g_{x_k}(\xi_{x_k}, \zeta_{x_k}),$ for all $\xi_{x_k} \in \tangent{x_k}$), \\
     Else 
     \begin{equation*}
         \widetilde{\mathcal{H}}^{SR1}_{k+1} [\cdot] = \mathcal{H}^{SR1}_k [\cdot].
@@ -169,7 +165,7 @@
 \end{frame}
 
 \begin{frame}{Convergence}
-    \vspace{-1\baselineskip}\hfill{\tiny{[Huang, 2011]}} \\[0.2\baselineskip]
+    \vspace{-1\baselineskip}\hfill{\tiny{[Huang, 2013]}} \\[0.2\baselineskip]
     Under reasonable assumptions we get 
     \begin{itemize}
         \item \alert{global covergence}, i.e. $\lim_{k \rightarrow \infty} \operatorname{grad} f(x_k) = 0$.
@@ -192,10 +188,12 @@
 \end{frame}
 
 \begin{frame}{Experiment}
-    \begin{center}
-        \includegraphics[width=11cm]{img/Rayleigh_Experiment_2.png}
-    \end{center}
+    \lstinputlisting[basicstyle=\small]{Rayleigh_Experiment.jl}
 \end{frame}
+
+%\begin{center}
+    %\includegraphics[width=11cm]{img/Rayleigh_Experiment_2.png}
+%\end{center}
 
 \begin{frame}{Results}
     Comparison of RTR-Newton and RTR-SR1 in an average of 10 random runs:
@@ -207,8 +205,9 @@
                 \cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7}
                 Quadratic term & Newton & SR1 & Newton & SR1 & Newton & SR1 \\ 
 
-                Time in ms & $4.5$ & $17.0$ & $54.2$ & $80.2$ & $245.5$ & $269.4$\\ 
-                Iterations & $9.2$ & $41.5$ & $10.2$ & $70.1$ & $10.5$ & $83.1$ \\
+                $\varnothing$ Time in ms & $4.5$ & $17.0$ & $54.2$ & $80.2$ & $245.5$ & $269.4$\\ 
+                $\varnothing$ Iterations & $9.2$ & $41.5$ & $10.2$ & $70.1$ & $10.5$ & $83.1$ \\
+                $\varnothing$ k Allocations& $9.2$ & $41.5$ & $10.2$ & $70.1$ & $10.5$ & $83.1$ \\
                 \bottomrule
             \end{tabular}
         }
@@ -228,5 +227,16 @@
         Thank you for your attention! 
     \end{center}
 \end{frame}
+
+\begin{frame}{References}
+    \textbf{[Absil, Mahony, Sepulchre, 2008]}: \\
+    Absil, P.-A. and Mahony, R. and Sepulchre, R.: Optimization Algorithms on Matrix Manifolds, 2008. \\[0.7\baselineskip]
+    \textbf{[Huang, 2013]}: \\
+    Huang, W.: Optimization Algorithms on Riemannian Manifolds with Applications, 2013. \\[0.7\baselineskip]
+    Huang, W. and Absil, P.-A. and Gallivan, K. A.: A Riemannian symmetric rank-one trust-region method, 2014. \\[0.7\baselineskip]
+    Absil, P.-A. and Baker, C. G. and Gallivan, K. A.: Trust-region methods on Riemannian manifolds, 2007. \\[0.7\baselineskip]
+\end{frame}
+
+% [Absil, Mahony, Sepulchre, 2008]: Absil, P.-A. and Mahony, R. and Sepulchre, R.: Optimization Algorithms on Matrix Manifolds, 2008. [Huang, 2013]: Huang, W.: Optimization Algorithms on Riemannian Manifolds with Applications, 2013.
 
 \end{document}
