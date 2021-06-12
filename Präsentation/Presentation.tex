@@ -122,7 +122,7 @@
 
 % The link to the Euclidean variant must still be found, in which it is made clear that eta_k generalizes the distance between x_k and x_k+1. Maybe another slide.
 \begin{frame}{Symmetric Rank One Update}
-    Let $\nu \in (0,1)$, $\mathcal{H}^{SR1}_0 [\cdot] = id_{\tangent{x_0}}[\cdot]$. We have
+    Let $\nu \in (0,1)$, $\mathcal{H}^{SR1}_0 [\cdot] = id[\cdot]$. We have
     \begin{align*}
         & s_k \in \tangent{x_k} \quad (\widetilde{x}_{k+1} = R_{x_k}(s_k) \text{ generalizes } \widetilde{x}_{k+1} = x_k + s_k) \\
         & y_k = \alert{{T^{S}_{x_k, s_k}}^{-1} (} \operatorname{grad}f(\widetilde{x}_{k+1}) \alert{)} - \operatorname{grad}f(x_k) \in \tangent{x_k}.
@@ -148,7 +148,7 @@
     While not converged, do... 
 
     \begin{enumerate}
-        \item Obtain $s_k$ by (approximately) solving $m_k(s)$ with $\mathcal{H}_k = \mathcal{H}^{SR1}_k$.
+        \item Compute $s_k = \arg \min_{\lVert s \rVert_{x_k} \leq \Delta_k} m_k( s )$ with $\mathcal{H}_k = \mathcal{H}^{SR1}_k$.
         \item Set $\widetilde{x}_{k+1} = R_{x_k}(s_k)$, compute $y_k$.
         \item If $\lvert g_{x_k}(s_k, y_k - \mathcal{H}_k[s_k]) \rvert \geq \nu \; \lVert s_k \rVert_{x_k} \lVert y_k - \mathcal{H}_k[s_k] \rVert_{x_k}$ \\
         \hspace{10mm} Update $\mathcal{H}^{SR1}_k \rightarrow \widetilde{\mathcal{H}}^{SR1}_{k+1}$, \\
@@ -218,9 +218,9 @@
 
 \begin{frame}{Conclusion}
     \begin{itemize}
-        \item RTR-SR1 method is generalized to Riemannian manifolds.
+        \item TR-SR1 method is generalized to Riemannian manifolds.
         \item SR1 approximation is implemented in Manopt.jl.
-        \item Next step: Implementing limited-memory variant (and other approximation methods).
+        \item Next step: Minimizing allocations, implementing limited-memory variant (and other approximation methods).
     \end{itemize}
     \vspace{10mm}
     \begin{center}
@@ -230,11 +230,12 @@
 
 \begin{frame}{References}
     \textbf{[Absil, Mahony, Sepulchre, 2008]}: \\
-    Absil, P.-A. and Mahony, R. and Sepulchre, R.: Optimization Algorithms on Matrix Manifolds, 2008. \\[0.7\baselineskip]
+    Absil, P.-A. and Mahony, R. and Sepulchre, R.: Optimization Algorithms on Matrix Manifolds, 2008. \\[0.4\baselineskip]
     \textbf{[Huang, 2013]}: \\
-    Huang, W.: Optimization Algorithms on Riemannian Manifolds with Applications, 2013. \\[0.7\baselineskip]
-    Huang, W. and Absil, P.-A. and Gallivan, K. A.: A Riemannian symmetric rank-one trust-region method, 2014. \\[0.7\baselineskip]
-    Absil, P.-A. and Baker, C. G. and Gallivan, K. A.: Trust-region methods on Riemannian manifolds, 2007. \\[0.7\baselineskip]
+    Huang, W.: Optimization Algorithms on Riemannian Manifolds with Applications, 2013. \\[0.4\baselineskip]
+    Huang, W. and Absil, P.-A. and Gallivan, K. A.: A Riemannian symmetric rank-one trust-region method, 2014. \\[0.4\baselineskip]
+    Absil, P.-A. and Baker, C. G. and Gallivan, K. A.: Trust-region methods on Riemannian manifolds, 2007. \\[0.4\baselineskip]
+    Byrd, R. H. and Khalfan, H. F. and Schnabel, R. B.: Analysis of a Symmetric Rank-One Trust Region Method, 1996. 
 \end{frame}
 
 % [Absil, Mahony, Sepulchre, 2008]: Absil, P.-A. and Mahony, R. and Sepulchre, R.: Optimization Algorithms on Matrix Manifolds, 2008. [Huang, 2013]: Huang, W.: Optimization Algorithms on Riemannian Manifolds with Applications, 2013.
