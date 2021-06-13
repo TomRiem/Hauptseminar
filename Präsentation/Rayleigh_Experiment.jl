@@ -1,10 +1,10 @@
-using Manopt, Manifolds, Random
-Random.seed!(42)
+using Manopt, Manifolds
 n = 50
 A = randn(n,n)
 A = (A+A')/2
-F(::Sphere, p::Array{Float64,1}) = p'*A*p
-gradF(::Sphere, p::Array{Float64,1}) = 2*(A*p-p*p'*A*p)
+F(::Sphere,p::Array{Float64,1}) = p'*A*p
+gradF(::Sphere,p::Array{Float64,1}) = 2*(A*p-p*p'*A*p)
+
 M = Sphere(n-1)
 x = random_point(M)
 
