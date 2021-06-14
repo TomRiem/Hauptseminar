@@ -53,12 +53,12 @@
     \end{equation*}
 \end{frame}
 
-\begin{frame}{Euclidean Trust-Region Methods}
-    \alert{Quadratic model} at current iterate:
+\begin{frame}{Euclidean Trust-Region Method}
+    \alert{Quadratic model} at current iterate
 	\begin{equation*}
     	m_k(s) = f(x_k) + \alert{\nabla f(x_k)}^{\mathrm{T}} s + \frac{1}{2} s^{\mathrm{T}} H_k s.
     \end{equation*}
-	Finding a \alert{step} (e.g. with tCG):
+	Compute \alert{step} (e.g. with TCG)
 	\begin{equation*}
         s_k = \arg \min_{\alert{\lVert} s \alert{\rVert_2} \leq \Delta_k} m_k(s),
     \end{equation*}
@@ -71,14 +71,14 @@
     Update $\Delta_k \rightarrow \Delta_{k+1}$ depending on $\rho_k$ and $\lVert s_k \rVert_2$.
 \end{frame}
 
-\section{RTR-SR1 Method}
+\section{Riemannian Trust-Region SR1 Method}
 
 \begin{frame}{Tangent Spaces}
     \vspace{-0.5\baselineskip}\hfill{\tiny{[Absil, Mahony, Sepulchre, 2008]}}
     \begin{center}
         \includegraphics[width=5cm]{img/Riemannian_Metric.png}
     \end{center}
-    \textbf{Tangent space} $\tangent{x}$ at $x$ is the set of all tangent vectors (directions) at $x$. $\tangent{x}$ is a linear space. \\[0.2\baselineskip]
+    \textbf{Tangent space} $\tangent{x}$ at $x$ is the set of all tangent vectors at $x$. $\tangent{x}$ is a linear space. \\[0.2\baselineskip]
     \textbf{Riemannian metric} $g_{\cdot} (\cdot, \cdot)$ is a smoothly-varying inner product on the tangent spaces. Norm: $\lVert \xi_x \rVert_x = \sqrt{g_x(\xi_x, \xi_x)}$. \\[0.2\baselineskip]
     \textbf{Riemannian gradient} \\
     $\mathrm{D} \, f(x) [\eta_x] = g_x (\operatorname{grad} f(x), \eta_x) = {\operatorname{grad} f(x)}^{\flat} [\eta_x]$ for all $\eta_x \in \tangent{x}$.
@@ -96,7 +96,7 @@
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Riemannian Trust-Region Methods}
+\begin{frame}{Riemannian Trust-Region Method}
     \vspace{-1.5\baselineskip}
     \begin{align*}
         m_k( s ) & = f(x_k) + g_{x_k}(\operatorname{grad} f(x_k), s ) + \frac{1}{2} g_{x_k}( s , \alert{\mathcal{H}_k [} s \alert{]} ) \\
@@ -108,7 +108,7 @@
 	\textbf{TR SR1 Method}: \\[0.2\baselineskip]
     $\mathcal{H}_k = \mathcal{H}^{SR1}_k \approx \operatorname{Hess} f(x_k)$. \\[0.2\baselineskip]
     $\mathcal{H}^{SR1}_k \rightarrow \mathcal{H}^{SR1}_{k+1} \colon \alert{\tangent{x_{k+1}}} \to \alert{\tangent{x_{k+1}}}$ \\[0.2\baselineskip]
-    using $s_k, \operatorname{grad} f(x_k) \in \alert{\tangent{x_k}}$ and $\operatorname{grad}f(\widetilde{x}_{k+1}) \in \alert{\tangent{\widetilde{x}_{k+1}}}$.
+    using $s_k, \ \operatorname{grad} f(x_k) \in \alert{\tangent{x_k}}$ and $\operatorname{grad}f(\widetilde{x}_{k+1}) \in \alert{\tangent{\widetilde{x}_{k+1}}}$.
 \end{frame}
 
 \begin{frame}{Vector Transports}
@@ -166,10 +166,10 @@
 
 \begin{frame}{Convergence}
     \vspace{-1\baselineskip}\hfill{\tiny{[Huang, 2013]}} \\[0.2\baselineskip]
-    Under reasonable assumptions we get 
+    Under reasonable assumptions we get:
     \begin{itemize}
-        \item \alert{global covergence}, i.e. $\lim_{k \rightarrow \infty} \operatorname{grad} f(x_k) = 0$.
-        \item $\{ x_k \}_k$ converges to nondegenerate local minimizer $x^*$ $\alert{n + 1}$\alert{-step superlinearly}, i.e. \begin{equation*}\lim_{k \rightarrow \infty} \frac{\operatorname{dist}(x_{k+n+1}, x^*)}{\operatorname{dist}(x_k, x^*)} = 0, \end{equation*} where $n$ is the dimension of the manifold.
+        \item \alert{Global covergence}, i.e. $\lim_{k \rightarrow \infty} \operatorname{grad} f(x_k) = 0$.
+        \item $\{ x_k \}_k$ converges to a nondegenerate local minimizer $x^*$ $\alert{n + 1}$\alert{-step superlinearly}, i.e. \begin{equation*}\lim_{k \rightarrow \infty} \frac{\operatorname{dist}(x_{k+n+1}, x^*)}{\operatorname{dist}(x_k, x^*)} = 0, \end{equation*} where $n$ is the dimension of the manifold.
     \end{itemize}
 \end{frame}
 
@@ -196,7 +196,7 @@
 %\end{center}
 
 \begin{frame}{Results}
-    Comparison of RTR-Newton and RTR-SR1 in an average of 10 random runs:
+    Comparison of RTR-Newton and RTR-SR1 method in an average of 10 random runs:
     \begin{table}[H]
         \resizebox{\textwidth}{!}{
             \begin{tabular}{lcccccc}
