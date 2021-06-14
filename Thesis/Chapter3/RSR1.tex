@@ -1,5 +1,41 @@
 \section{Riemannian Symmetric Rank-One Update}
 
+% Vector transport, flat, SR1 Update (unique), safeguard, algorithm, convergence
+
+
+A general symmetric rank-one update has the form
+\begin{equation*}
+    H_{k+1} = H_k + \sigma \, v v^{\mathrm{T}},
+\end{equation*}
+where $v \in \mathbb{R}^n$ and $\sigma \in \{-1,1\}$. The task now is to determine $v$ and $\sigma$ so that $H_{k+1}$ satisfies the quasi-Newton equation, \cref{quasi-NewtonEquation}. By substituting into \cref{quasi-NewtonEquation}, we obtain
+\begin{equation}
+    H_k s_k + [\sigma \, v^{\mathrm{T}} s_k] v = y_k.
+\end{equation}
+Since $[\sigma \, v^{\mathrm{T}} s_k]$ is a scalar, $v$ must be a multiple of $y_k − H_k s_k$, i.e. $v = \delta (y_k − H_k s_k)$ for some $\delta \in \mathbb{R}$. By substituting this form of $v$ into \cref{Derivation1}, we obtain
+\begin{equation}
+    (y_k − H_k s_k) = \sigma \, \delta^2 \, [s^{\mathrm{T}}_k (y_k − H_k s_k)](y_k − H_k s_k),
+\end{equation}
+and it is clear that this equation is satisfied if (and only if) we choose the parameters $\delta$ and $\sigma$ to be
+\begin{equation*}
+    \sigma = \operatorname{sgn} (s^{\mathrm{T}}_k (y_k − H_k s_k)), \quad \delta = \pm \lvert s^{\mathrm{T}}_k (y_k − H_k s_k) \rvert^{-\frac{1}{2}}.
+\end{equation*}
+Hence, the only symmetric rank-one update formula that satisfies the quasi-Newton equation, \cref{quasi-NewtonEquation}, is given by
+\begin{equation}
+    H^\mathrm{SR1}_{k+1} = H^\mathrm{SR1}_k + \frac{(y_k - H^\mathrm{SR1}_k s_k) (y_k - H^\mathrm{SR1}_k s_k)^{\mathrm{T}}}{(y_k - H^\mathrm{SR1}_k s_k)^{\mathrm{T}} s_k}.
+\end{equation}
+By applying the Sherman–Morrison-Woodbury formula (cf. \cite[Theorem~1.2.16]{SunYuan:2006}), we obtain the corresponding update formula for the approximation of Hessian inverse ${\nabla^{2} f(x_{k+1})}^{-1}$:
+\begin{equation}
+    B^\mathrm{SR1}_{k+1} = B^\mathrm{SR1}_k + \frac{(s_k - B^\mathrm{SR1}_k y_k) (s_k - B^\mathrm{SR1}_k y_k)^{\mathrm{T}}}{(s_k - B^\mathrm{SR1}_k y_k)^{\mathrm{T}} y_k}.
+\end{equation}
+It is easy to see in that even if $H^\mathrm{SR1}_k$ is positive definite, $H^\mathrm{SR1}_{k+1}$ may not have the same property (this holds also for $B^\mathrm{SR1}_k$ and $B^\mathrm{SR1}_{k+1}$). If and only if $(y_k - H^\mathrm{SR1}_k s_k)^{\mathrm{T}} s_k > 0$, the SR1 update retains positive definiteness. However, this condition is difficult to guarantee. This means that $H^\mathrm{SR1}_{k+1}$ or $B^\mathrm{SR1}_{k+1}$ may no longer be invertible. Moreover, $d_{k+1} = -{H^\mathrm{SR1}_{k+1}}^{-1} \nabla f(x_{k+1}) = -B^\mathrm{SR1}_{k+1} \nabla f(x_{k+1})$ is not necessarily a descent direction. \\
+The main drawback of the SR1 update formula is that the denominator in \cref{directSR1formula} or   can vanish. In fact, even when the objective function $f$ is convex and quadratic, there may be steps on which there is no symmetric rank-one update that satisfies the quasi-Newton equation \cref{quasi-NewtonEquation}. This disadvantage results in serious numerical difficulties, which restrict the applications of it. Nevertheless, the SR1 update formula has the following advantages:
+For the vanishing denominator in \cref{directSR1formula} we introduce a strategy to prevent a method using the SR1 update from breaking down. It has been observed in practice that it performs well simply by skipping the update if the denominator is small. More specifically, the update \cref{directSR1formula} is applied only if 
+\begin{equation}
+    \lvert (y_k - H^\mathrm{SR1}_k s_k)^{\mathrm{T}} s_k \lvert \; \geq \; r \; \lVert s_k \rVert \lVert y_k - H^\mathrm{SR1}_k s_k \rVert 
+\end{equation}
+holds, where $r \in (0, 1)$ is a small number, e.g. $r = 10^{−8}$. Most implementations of the SR1 update use a skipping rule of this kind. The condition $(y_k - H^\mathrm{SR1}_k s_k)^{\mathrm{T}} s_k \approx 0$ occurs infrequently, since it requires certain vectors to be aligned in a specific way. When it occurs, skipping the update appears to have no negative effects on the iteration, since the skipping condition implies that $s^{\mathrm{T}}_k \tilde{G} s_k \approx s^{\mathrm{T}}_k H^\mathrm{SR1}_k s_k$, where $\tilde{G}$ is the average Hessian over the last step, meaning that the curvature of $H^\mathrm{SR1}_k$ along $s_k$ is already correct. \\
+
+
 The direct SR1 update for operators on tangent spaces of the manifold which approximates the action of the Riemannian Hessian $\operatorname{Hess} f(x_{k+1}) [\cdot]$ is given by 
 \begin{equation}\label{RiemannianDirectSR1formula}
     \mathcal{H}^\mathrm{RSR1}_{k+1} [\cdot] = \widetilde{\mathcal{H}}^\mathrm{SR1}_k [\cdot] + \frac{(y_k - \widetilde{\mathcal{H}}^\mathrm{SR1}_k [s_k]) (y_k - \widetilde{\mathcal{H}}^\mathrm{SR1}_k [s_k])^{\flat} [\cdot] }{(y_k - \widetilde{\mathcal{H}}^\mathrm{SR1}_k [s_k])^{\flat} [s_k]}
@@ -8,7 +44,7 @@ The direct SR1 update for operators on tangent spaces of the manifold which appr
 \begin{equation}\label{RiemannianInverseSR1formula}
     \mathcal{B}^\mathrm{RSR1}_{k+1} [\cdot] = \widetilde{\mathcal{B}}^\mathrm{SR1}_k [\cdot] + \frac{(s_k - \widetilde{\mathcal{B}}^\mathrm{SR1}_k [y_k]) (s_k - \widetilde{\mathcal{B}}^\mathrm{SR1}_k [y_k])^{\flat} [\cdot] }{(s_k - \widetilde{\mathcal{B}}^\mathrm{SR1}_k [y_k])^{\flat} [y_k]}.
 \end{equation}
-We see immediately that both \cref{RiemannianDirectSR1formula} and \cref{RiemannianInverseSR1formula} create self-adjoint operators if $\widetilde{\mathcal{H}}^\mathrm{SR1}_k$ or $\widetilde{\mathcal{B}}^\mathrm{SR1}_k$ are self-adjoint (which are self-adjoint if $\mathcal{H}^\mathrm{SR1}_k$ or $\mathcal{B}^\mathrm{SR1}_k$ are self-adjoint, since the parallel transport $\parallelTransportSymbol$ is an isometric vector transport). Furthermore, we see that the update formula \cref{RiemannianDirectSR1formula} produces a positive definite operator if $\widetilde{\mathcal{H}}^\mathrm{SR1}_k$ is positive definite (which is positive definite if $\mathcal{H}^\mathrm{SR1}_k$ is positive definite, since the parallel transport $\parallelTransportSymbol$ is an isometric vector transport) and $(y_k - \widetilde{\mathcal{H}}^\mathrm{SR1}_k [s_k])^{\flat} [s_k] = g_{x_{k+1}}(y_k - \widetilde{\mathcal{H}}^\mathrm{SR1}_k [s_k], s_k) >0$ holds (the same of course for \cref{RiemannianInverseSR1formula}). This shows that, just as in the Euclidean case, the search direction $\eta_k \in \tangent{x_k}$ does not always have to be a descent direction and that there is also the possibility that this method can break down if the numerator in \cref{RiemannianDirectSR1formula} is equal to zero. In order to overcome this, \cref{CautiousSR1} can be transferred to the Riemannian setup. This means that \cref{RiemannianDirectSR1formula} is only executed if
+We see immediately that both \cref{RiemannianDirectSR1formula} and \cref{RiemannianInverseSR1formula} create self-adjoint operators if $\widetilde{\mathcal{H}}^\mathrm{SR1}_k$ or $\widetilde{\mathcal{B}}^\mathrm{SR1}_k$ are self-adjoint (which are self-adjoint if $\mathcal{H}^\mathrm{SR1}_k$ or $\mathcal{B}^\mathrm{SR1}_k$ are self-adjoint, since the parallel transport $\parallelTransportSymbol$ is an isometric vector transport). Furthermore, we see that the update formula \cref{RiemannianDirectSR1formula} produces a positive definite operator if $\widetilde{\mathcal{H}}^\mathrm{SR1}_k$ is positive definite (which is positive definite if $\mathcal{H}^\mathrm{SR1}_k$ is positive definite, since the parallel transport $\parallelTransportSymbol$ is an isometric vector transport) and $(y_k - \widetilde{\mathcal{H}}^\mathrm{SR1}_k [s_k])^{\flat} [s_k] = g_{x_{k+1}}(y_k - \widetilde{\mathcal{H}}^\mathrm{SR1}_k [s_k], s_k) >0$ holds (the same of course for \cref{RiemannianInverseSR1formula}). This shows that, just as in the Euclidean case, the search direction $\eta_k \in \tangent{x_k}$ does not always have to be a descent direction and that there is also the possibility that this method can break down if the numerator in \cref{RiemannianDirectSR1formula} is equal to zero. In order to overcome this, can be transferred to the Riemannian setup. This means that \cref{RiemannianDirectSR1formula} is only executed if
 \begin{equation}\label{RiemannianCautiousSR1}
     \lvert g_{x_{k+1}}(y_k - \widetilde{\mathcal{H}}^\mathrm{SR1}_k [s_k], s_k) \lvert \; \geq \; r \; \lVert s_k \rVert_{x_{k+1}} \lVert y_k - \widetilde{\mathcal{H}}^\mathrm{SR1}_k [s_k] \rVert_{x_{k+1}} 
 \end{equation}
