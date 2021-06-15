@@ -1,4 +1,5 @@
 \documentclass{beamer}
+\hypersetup{pdfpagemode=FullScreen}
 \usefonttheme{professionalfonts}
 \usetheme[subsectionpage=progressbar]{metropolis}
 \setbeamertemplate{section in toc}[sections numbered]
@@ -43,7 +44,7 @@
 \begin{frame}{Riemannian Optimization}
     Finding a \textbf{minimum} of a real-valued function $f$ on a Riemannian manifold, i.e. \\
     \begin{equation*}
-        \min f(x), \quad x \in \mathcal{M}.
+        \min \ f(x), \quad x \in \mathcal{M}.
     \end{equation*}\\[1.\baselineskip]
     \begin{center}
         \textbf{Riemannian manifold} = smooth manifold + Riemannian metric. \\[1.\baselineskip]
@@ -58,11 +59,11 @@
 	\begin{equation*}
     	m_k(s) = f(x_k) + \alert{\nabla f(x_k)}^{\mathrm{T}} s + \frac{1}{2} s^{\mathrm{T}} H_k s.
     \end{equation*}
-	Compute \alert{step} (e.g. with TCG)
+	Compute \alert{step} (e.g. with TCG-method)
 	\begin{equation*}
         s_k = \arg \min_{\alert{\lVert} s \alert{\rVert_2} \leq \Delta_k} m_k(s),
     \end{equation*}
-	where $\Delta_k > 0$ defines the \alert{trust-region}. \\
+	where $\Delta_k > 0$ determines the \alert{trust-region}. \\
     The candidate of the next iterate is
 	\begin{equation*}
         \widetilde{x}_{k+1} = \alert{x_k + s_k}.
@@ -106,8 +107,8 @@
     \textbf{TR Newton Method}: \\[0.2\baselineskip]
     $\mathcal{H}_k = \operatorname{Hess} f(x_k) \colon \tangent{x_k} \ni \xi_{x_k} \mapsto \nabla_{\xi_{x_k}} \operatorname{grad} f(x_k) \in \tangent{x_k}$. \\[0.7\baselineskip]
 	\textbf{TR SR1 Method}: \\[0.2\baselineskip]
-    $\mathcal{H}_k = \mathcal{H}^{SR1}_k \approx \operatorname{Hess} f(x_k)$. \\[0.2\baselineskip]
-    $\mathcal{H}^{SR1}_k \rightarrow \mathcal{H}^{SR1}_{k+1} \colon \alert{\tangent{x_{k+1}}} \to \alert{\tangent{x_{k+1}}}$ \\[0.2\baselineskip]
+    $\mathcal{H}_k = \mathcal{H}^{SR1}_k \approx \operatorname{Hess} f(x_k) \colon \alert{\tangent{x_{k}}} \to \alert{\tangent{x_{k}}}$. \\[0.2\baselineskip]
+    $\mathcal{H}^{SR1}_k \rightarrow \mathcal{H}^{SR1}_{k+1} \colon \alert{\tangent{x_{k+1}}} \to \alert{\tangent{x_{k+1}}}$. \\[0.2\baselineskip]
     using $s_k, \ \operatorname{grad} f(x_k) \in \alert{\tangent{x_k}}$ and $\operatorname{grad}f(\widetilde{x}_{k+1}) \in \alert{\tangent{\widetilde{x}_{k+1}}}$.
 \end{frame}
 
@@ -121,7 +122,7 @@
 \end{frame}
 
 % The link to the Euclidean variant must still be found, in which it is made clear that eta_k generalizes the distance between x_k and x_k+1. Maybe another slide.
-\begin{frame}{Symmetric Rank One Update}
+\begin{frame}{Symmetric Rank-One Update}
     Let $\nu \in (0,1)$, $\mathcal{H}^{SR1}_0 [\cdot] = id[\cdot]$. We have
     \begin{align*}
         & s_k \in \tangent{x_k} \quad (\widetilde{x}_{k+1} = R_{x_k}(s_k) \text{ generalizes } \widetilde{x}_{k+1} = x_k + s_k) \\
@@ -129,36 +130,35 @@
     \end{align*}
     If
     \begin{equation*}
-        \lvert g_{x_k}(s_k, y_k - \mathcal{H}^{SR1}_k[s_k]) \rvert \geq \nu \; \lVert s_k \rVert_{x_k} \lVert y_k - \mathcal{H}^{SR1}_k[s_k] \rVert_{x_k}
+        \lvert g_{x_k}(y_k - \mathcal{H}^{SR1}_k[s_k], \ s_k) \rvert \geq \nu \; \lVert y_k - \mathcal{H}^{SR1}_k[s_k] \rVert_{x_k} \ \lVert s_k \rVert_{x_k} 
     \end{equation*}
     then
     \begin{equation*}
-        \widetilde{\mathcal{H}}^{SR1}_{k+1} [\cdot] = \mathcal{H}^{SR1}_k [\cdot] + \frac{(y_k - \mathcal{H}^{SR1}_k [s_k]) (y_k - \mathcal{H}^{SR1}_k [s_k])^{\flat} [\cdot] }{(y_k - \mathcal{H}^{SR1}_k [s_k])^{\flat} [s_k]},
+        \widetilde{\mathcal{H}}^{SR1}_{k+1} [\cdot] = \mathcal{H}^{SR1}_k [\cdot] + \frac{(y_k - \mathcal{H}^{SR1}_k [s_k]) (y_k - \mathcal{H}^{SR1}_k [s_k])^{\flat} [\cdot] }{g_{x_k}(y_k - \mathcal{H}^{SR1}_k[s_k], \ s_k)}
     \end{equation*}
-    % where $\xi^{\flat}_{x_k} \colon \tangent{x_k} \ni \zeta_{x_k} \mapsto g_{x_k}(\xi_{x_k}, \zeta_{x_k}),$ for all $\xi_{x_k} \in \tangent{x_k}$. \\
+    and the quasi-Newton equation $\widetilde{\mathcal{H}}^{SR1}_{k+1} [s_k] = y_k$ holds, \\
     Else 
     \begin{equation*}
         \widetilde{\mathcal{H}}^{SR1}_{k+1} [\cdot] = \mathcal{H}^{SR1}_k [\cdot].
     \end{equation*}
-    % $\widetilde{\mathcal{H}}^{SR1}_{k+1} [\cdot] = \mathcal{H}^{SR1}_k [\cdot]$. 
-    % In both cases: $\widetilde{\mathcal{H}}^{SR1}_{k+1} [s_k] = y_k$.
+
 \end{frame}
 
 \begin{frame}{RTR-SR1 Method}
     While not converged, do... 
 
     \begin{enumerate}
-        \item Compute $s_k = \arg \min_{\lVert s \rVert_{x_k} \leq \Delta_k} m_k( s )$ with $\mathcal{H}_k = \mathcal{H}^{SR1}_k$.
+        \item Compute $s_k = \arg \min_{\lVert s \rVert_{x_k} \leq \Delta_k} m_k( s )$ using $\mathcal{H}_k = \mathcal{H}^{SR1}_k$.
         \item Set $\widetilde{x}_{k+1} = R_{x_k}(s_k)$, compute $y_k$.
-        \item If $\lvert g_{x_k}(s_k, y_k - \mathcal{H}_k[s_k]) \rvert \geq \nu \; \lVert s_k \rVert_{x_k} \lVert y_k - \mathcal{H}_k[s_k] \rVert_{x_k}$ \\
+        \item If $\lvert g_{x_k}(y_k - \mathcal{H}^{SR1}_k[s_k], \ s_k) \rvert \geq \nu \; \lVert y_k - \mathcal{H}^{SR1}_k[s_k] \rVert_{x_k} \ \lVert s_k \rVert_{x_k}$ \\
         \hspace{10mm} Update $\mathcal{H}^{SR1}_k \rightarrow \widetilde{\mathcal{H}}^{SR1}_{k+1}$, \\
         Else \\
-        \hspace{10mm} $\widetilde{\mathcal{H}}^{SR1}_{k+1} = \mathcal{H}^{SR1}_{k}$. 
+        \hspace{10mm} Set $\widetilde{\mathcal{H}}^{SR1}_{k+1} = \mathcal{H}^{SR1}_{k}$. 
         \item Compute $\rho_k$.
         \item If $\rho_k > \rho^{\prime}$ \\
         \hspace{10mm} Set $x_{k+1} = \alert{\widetilde{x}_{k+1}}$ and $\mathcal{H}^{SR1}_{k+1} = \alert{T^{S}_{x_k, s_k} \circ \widetilde{\mathcal{H}}^{SR1}_{k+1} \circ  {T^{S}_{x_k, s_k}}^{-1}}$, \\
         Else \\
-        \hspace{10mm} $x_{k+1} = \alert{x_k}$ and $\mathcal{H}^{SR1}_{k+1} = \alert{\widetilde{\mathcal{H}}^{SR1}_{k+1}}$.
+        \hspace{10mm} Set $x_{k+1} = \alert{x_k}$ and $\mathcal{H}^{SR1}_{k+1} = \alert{\widetilde{\mathcal{H}}^{SR1}_{k+1}}$.
         \item Update trust-region radius $\Delta_k \rightarrow \Delta_{k+1}$.
         \item $k = k+1$.
     \end{enumerate}
@@ -177,7 +177,7 @@
 \section{Numerics}
 
 \begin{frame}{Rayleigh Quotient Minimization}
-    $A \in \mathbb{R}^{n \times n}$ symmetric, eigenvector $v \in \mathbb{R}^n$ to the smallest eigenvalue defines the two global minima $\pm v$ of the
+    $A \in \mathbb{R}^{n \times n}$ symmetric, the eigenvector $v \in \mathbb{R}^n$ to the smallest eigenvalue defines the two global minima $\pm v$ of the
     \begin{itemize}
         \item Rayleigh Quotient: $f \colon \; \mathbb{S}^{n-1} \to \mathbb{R}, \; x \mapsto x^{\mathrm{T}} A x$.
         \item $\operatorname{grad} f(x) = 2(Ax - x x^{\mathrm{T}} A x)$.
@@ -218,9 +218,9 @@
 
 \begin{frame}{Conclusion}
     \begin{itemize}
-        \item TR-SR1 method is generalized to Riemannian manifolds.
+        \item TR-SR1 method is generalized for Riemannian manifolds.
         \item SR1 approximation is implemented in Manopt.jl.
-        \item Next step: Minimizing allocations, implementing limited-memory variant (and other approximation methods).
+        \item Next step: Reducing allocations, implementing limited-memory variant (and other approximation methods).
     \end{itemize}
     \vspace{10mm}
     \begin{center}
