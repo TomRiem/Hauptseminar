@@ -1,6 +1,6 @@
-\section{Riemannian Symmetric Rank-One Update}
+\section{Riemannian Trust-Region Symmetric Rank-One Method}
 
-% Vector transport, flat, SR1 Update (unique), safeguard, algorithm, convergence
+% Vector transport, flat, quasi-Newton operator, SR1 Update (unique), safeguard, algorithm, convergence
 
 
 A general symmetric rank-one update has the form
@@ -19,14 +19,16 @@ and it is clear that this equation is satisfied if (and only if) we choose the p
 \begin{equation*}
     \sigma = \operatorname{sgn} (s^{\mathrm{T}}_k (y_k − H_k s_k)), \quad \delta = \pm \lvert s^{\mathrm{T}}_k (y_k − H_k s_k) \rvert^{-\frac{1}{2}}.
 \end{equation*}
-Hence, the only symmetric rank-one update formula that satisfies the quasi-Newton equation, \cref{quasi-NewtonEquation}, is given by
-\begin{equation}
-    H^\mathrm{SR1}_{k+1} = H^\mathrm{SR1}_k + \frac{(y_k - H^\mathrm{SR1}_k s_k) (y_k - H^\mathrm{SR1}_k s_k)^{\mathrm{T}}}{(y_k - H^\mathrm{SR1}_k s_k)^{\mathrm{T}} s_k}.
+
+
+Hence the direct SR1 update for operators on tangent spaces of the manifold which approximates the action of the Riemannian Hessian $\operatorname{Hess} f(x_{k+1}) [\cdot]$ is given by 
+\begin{equation}\label{RiemannianDirectSR1formula}
+    \mathcal{H}^\mathrm{RSR1}_{k+1} [\cdot] = \widetilde{\mathcal{H}}^\mathrm{SR1}_k [\cdot] + \frac{(y_k - \widetilde{\mathcal{H}}^\mathrm{SR1}_k [s_k]) (y_k - \widetilde{\mathcal{H}}^\mathrm{SR1}_k [s_k])^{\flat} [\cdot] }{(y_k - \widetilde{\mathcal{H}}^\mathrm{SR1}_k [s_k])^{\flat} [s_k]}
 \end{equation}
-By applying the Sherman–Morrison-Woodbury formula (cf. \cite[Theorem~1.2.16]{SunYuan:2006}), we obtain the corresponding update formula for the approximation of Hessian inverse ${\nabla^{2} f(x_{k+1})}^{-1}$:
-\begin{equation}
-    B^\mathrm{SR1}_{k+1} = B^\mathrm{SR1}_k + \frac{(s_k - B^\mathrm{SR1}_k y_k) (s_k - B^\mathrm{SR1}_k y_k)^{\mathrm{T}}}{(s_k - B^\mathrm{SR1}_k y_k)^{\mathrm{T}} y_k}.
-\end{equation}
+\cite[p.~18]{Huang:2013}.
+
+
+
 It is easy to see in that even if $H^\mathrm{SR1}_k$ is positive definite, $H^\mathrm{SR1}_{k+1}$ may not have the same property (this holds also for $B^\mathrm{SR1}_k$ and $B^\mathrm{SR1}_{k+1}$). If and only if $(y_k - H^\mathrm{SR1}_k s_k)^{\mathrm{T}} s_k > 0$, the SR1 update retains positive definiteness. However, this condition is difficult to guarantee. This means that $H^\mathrm{SR1}_{k+1}$ or $B^\mathrm{SR1}_{k+1}$ may no longer be invertible. Moreover, $d_{k+1} = -{H^\mathrm{SR1}_{k+1}}^{-1} \nabla f(x_{k+1}) = -B^\mathrm{SR1}_{k+1} \nabla f(x_{k+1})$ is not necessarily a descent direction. \\
 The main drawback of the SR1 update formula is that the denominator in \cref{directSR1formula} or   can vanish. In fact, even when the objective function $f$ is convex and quadratic, there may be steps on which there is no symmetric rank-one update that satisfies the quasi-Newton equation \cref{quasi-NewtonEquation}. This disadvantage results in serious numerical difficulties, which restrict the applications of it. Nevertheless, the SR1 update formula has the following advantages:
 For the vanishing denominator in \cref{directSR1formula} we introduce a strategy to prevent a method using the SR1 update from breaking down. It has been observed in practice that it performs well simply by skipping the update if the denominator is small. More specifically, the update \cref{directSR1formula} is applied only if 
@@ -36,34 +38,80 @@ For the vanishing denominator in \cref{directSR1formula} we introduce a strategy
 holds, where $r \in (0, 1)$ is a small number, e.g. $r = 10^{−8}$. Most implementations of the SR1 update use a skipping rule of this kind. The condition $(y_k - H^\mathrm{SR1}_k s_k)^{\mathrm{T}} s_k \approx 0$ occurs infrequently, since it requires certain vectors to be aligned in a specific way. When it occurs, skipping the update appears to have no negative effects on the iteration, since the skipping condition implies that $s^{\mathrm{T}}_k \tilde{G} s_k \approx s^{\mathrm{T}}_k H^\mathrm{SR1}_k s_k$, where $\tilde{G}$ is the average Hessian over the last step, meaning that the curvature of $H^\mathrm{SR1}_k$ along $s_k$ is already correct. \\
 
 
-The direct SR1 update for operators on tangent spaces of the manifold which approximates the action of the Riemannian Hessian $\operatorname{Hess} f(x_{k+1}) [\cdot]$ is given by 
-\begin{equation}\label{RiemannianDirectSR1formula}
-    \mathcal{H}^\mathrm{RSR1}_{k+1} [\cdot] = \widetilde{\mathcal{H}}^\mathrm{SR1}_k [\cdot] + \frac{(y_k - \widetilde{\mathcal{H}}^\mathrm{SR1}_k [s_k]) (y_k - \widetilde{\mathcal{H}}^\mathrm{SR1}_k [s_k])^{\flat} [\cdot] }{(y_k - \widetilde{\mathcal{H}}^\mathrm{SR1}_k [s_k])^{\flat} [s_k]}
-\end{equation}
-\cite[p.~18]{Huang:2013}, and it is not difficult to derive the update formula for the approximation of the Hessian inverse ${\operatorname{Hess} f(x_{k+1})}^{-1} [\cdot]$, which is given by 
-\begin{equation}\label{RiemannianInverseSR1formula}
-    \mathcal{B}^\mathrm{RSR1}_{k+1} [\cdot] = \widetilde{\mathcal{B}}^\mathrm{SR1}_k [\cdot] + \frac{(s_k - \widetilde{\mathcal{B}}^\mathrm{SR1}_k [y_k]) (s_k - \widetilde{\mathcal{B}}^\mathrm{SR1}_k [y_k])^{\flat} [\cdot] }{(s_k - \widetilde{\mathcal{B}}^\mathrm{SR1}_k [y_k])^{\flat} [y_k]}.
-\end{equation}
-We see immediately that both \cref{RiemannianDirectSR1formula} and \cref{RiemannianInverseSR1formula} create self-adjoint operators if $\widetilde{\mathcal{H}}^\mathrm{SR1}_k$ or $\widetilde{\mathcal{B}}^\mathrm{SR1}_k$ are self-adjoint (which are self-adjoint if $\mathcal{H}^\mathrm{SR1}_k$ or $\mathcal{B}^\mathrm{SR1}_k$ are self-adjoint, since the parallel transport $\parallelTransportSymbol$ is an isometric vector transport). Furthermore, we see that the update formula \cref{RiemannianDirectSR1formula} produces a positive definite operator if $\widetilde{\mathcal{H}}^\mathrm{SR1}_k$ is positive definite (which is positive definite if $\mathcal{H}^\mathrm{SR1}_k$ is positive definite, since the parallel transport $\parallelTransportSymbol$ is an isometric vector transport) and $(y_k - \widetilde{\mathcal{H}}^\mathrm{SR1}_k [s_k])^{\flat} [s_k] = g_{x_{k+1}}(y_k - \widetilde{\mathcal{H}}^\mathrm{SR1}_k [s_k], s_k) >0$ holds (the same of course for \cref{RiemannianInverseSR1formula}). This shows that, just as in the Euclidean case, the search direction $\eta_k \in \tangent{x_k}$ does not always have to be a descent direction and that there is also the possibility that this method can break down if the numerator in \cref{RiemannianDirectSR1formula} is equal to zero. In order to overcome this, can be transferred to the Riemannian setup. This means that \cref{RiemannianDirectSR1formula} is only executed if
-\begin{equation}\label{RiemannianCautiousSR1}
+
+We see immediately that \cref{RiemannianDirectSR1formula} creates a self-adjoint operator if $\mathcal{H}^\mathrm{SR1}_k$ is self-adjoint. 
+
+There is also the possibility that this method can break down if the numerator in \cref{RiemannianDirectSR1formula} is equal to zero. In order to overcome this, can be transferred to the Riemannian setup. This means that \cref{RiemannianDirectSR1formula} is only executed if
+\begin{equation}\label{RiemannianSafeguard}
     \lvert g_{x_{k+1}}(y_k - \widetilde{\mathcal{H}}^\mathrm{SR1}_k [s_k], s_k) \lvert \; \geq \; r \; \lVert s_k \rVert_{x_{k+1}} \lVert y_k - \widetilde{\mathcal{H}}^\mathrm{SR1}_k [s_k] \rVert_{x_{k+1}} 
 \end{equation}
 holds, where $g_{x_{k+1}}(\cdot, \cdot) \colon \; \tangent{x_{k+1}} \times \tangent{x_{k+1}} \to \mathbb{R}$ is the inner product on $\tangent{x_{k+1}}$ (see \cite[p.~6]{BergmannHerzogLouzeiroSilvaTenbrinckVidalNunez:2020:1}) and $ \lVert \cdot \rVert_{x_{k+1}} = \sqrt{g_{x_{k+1}}(\cdot, \cdot)}$ denotes the resulting norm on $\tangent{x_{k+1}}$. The factor $r$ is again in the interval $(0,1)$. \\
-In summary, a Riemannian inverse SR1 quasi-Newton method, short inverse RSR1 method, which uses the approximation of the Hessian inverse ${\operatorname{Hess} f(x_{k+1})}^{-1} [\cdot]$, is as follows:
+
+
+
 \begin{algorithm}[H]
-    \caption{Inverse SR1 Method}\label{RiemannianSR1Method}
+    \caption{Riemannian Trust-Region Symmetric Rank-One Method}\label{RTR-SR1Method}
     \begin{algorithmic}[1]
-        \State Continuously differentiable real-valued function $f$ on $\mathcal{M}$, bounded below; initial iterate $x_0 \in \mathcal{M}$; initial positive definite and self-adjoint operator $\mathcal{B}^{\mathrm{SR1}}_0 \colon \; \tangent{x_0} \to \tangent{x_0}$; convergence tolerance $\varepsilon > 0$. Set $k = 0$.
-        \While{$\lVert \nabla f(x_k) \rVert_{x_k} > \varepsilon$}
-            \State Compute the search direction $\eta_k = - \mathcal{B}^{\mathrm{SR1}}_k [\operatorname{grad} f(x_k)]$.
-            \State Determine a suitable stepsize $\alpha_k > 0$. 
-            \State Set $x_{k+1} = \exponential{x_k} (\alpha_k \eta_k)$.
-            \State Set $\widetilde{\mathcal{B}}^{\mathrm{SR1}}_k = \parallelTransportDir{x_k}{\alpha_k \eta_k} \circ \mathcal{B}^{\mathrm{SR1}}_k \circ {\parallelTransportDir{x_k}{\alpha_k \eta_k}}^{-1}$, $s_k = \parallelTransportDir{x_k}{\alpha_k \eta_k} (\alpha_k \eta_k)$ and 
-            \StatexIndent[2] $y_k = \operatorname{grad} f(x_{k+1}) - \parallelTransportDir{x_k}{\alpha_k \eta_k} (\operatorname{grad} f(x_k))$.
-            \State Compute $\mathcal{B}^{\mathrm{SR1}}_{k+1} \colon \; \tangent{x_{k+1}} \to \tangent{x_{k+1}}$ by means of \cref{RiemannianInverseSR1formula}. 
+        \State Riemannian manifold $(\mathcal{M}, g)$; isometric vector transport $\vectorTransportSymbol^S$ with $\retractionSymbol$ as associated retraction; continuously differentiable real-valued function $f$ on $\mathcal{M}$, bounded below; initial iterate $x_0 \in \mathcal{M}$; initial self-adjoint operator $\mathcal{H}^{SR1}_0 \colon \; \tangent{x_0} \to \tangent{x_0}$; initial trust-region radius $\Delta_0 > 0$; safeguard constant $\nu \in (0,1)$; rejection boundary $\rho^{\prime} \in (0, 0.1)$; trust-region reduction factor $\tau_1 \in (0,1)$; trust-region magnification factor $\tau_2 > 1$; convergence tolerance $\varepsilon > 0$. Set $k = 0$.
+        \While{$\lVert \nabla f(x_k) \rVert > \varepsilon$}
+            \State Obtain $s_k$ (approximately) solving \cref{Riemanniantrsubproblem} using $\mathcal{H}^{SR1}_k$.
+            \State Set $\widetilde{x}_{k+1} = \retract{x_k}(s_k)$ and ${T^{S}_{x_k, s_k}}^{-1} ( \operatorname{grad}f(\widetilde{x}_{k+1}) ) - \operatorname{grad}f(x_k) \in \tangent{x_k}$.
+            \If{\cref{RiemannianSafeguard} holds}
+                \State Compute $\widetilde{\mathcal{H}}^{SR1}_{k+1} \colon \tangent{x_{k}} \to \tangent{x_{k}}$ by means of \cref{RiemannianDirectSR1formula}.
+			\Else 
+				\State Set $\widetilde{\mathcal{H}}^{SR1}_{k+1} = \mathcal{H}^{SR1}_k$.
+            \EndIf 
+            \State Compute $\rho_k = \frac{f(x_k) - f(\widetilde{x}_{k+1})}{m_k(0) - m_k(s_k)}$.
+            \If{$\rho_k > \rho^{\prime}$}
+                \State Set $x_{k+1} = \widetilde{x}_{k+1}$ and $\mathcal{H}^{SR1}_{k+1} = T^{S}_{x_k, s_k} \circ \widetilde{\mathcal{H}}^{SR1}_{k+1} \circ  {T^{S}_{x_k, s_k}}^{-1} \colon \tangent{x_{k+1}} \to \tangent{x_{k+1}}$.
+			\Else 
+				\State Set $x_{k+1} = x_k$ and $\mathcal{H}^{SR1}_{k+1} = \widetilde{\mathcal{H}}^{SR1}_{k+1} \colon \tangent{x_{k}} \to \tangent{x_{k}}$.
+            \EndIf 
+            \If{$\rho_k > 0.75$}
+                \If{$\lVert s_k \rVert \geq 0.8 \ \Delta_k$}
+                    \State Set $\Delta_{k+1} = \tau_2 \ \Delta_k$.
+                \Else 
+                    \State Set $\Delta_{k+1} = \Delta_k$.
+                \EndIf 
+			\Else 
+                \If{$\rho_k < 0.1$}
+                    \State Set $\Delta_{k+1} = \tau_1 \ \Delta_k$.
+                \Else 
+                    \State Set $\Delta_{k+1} = \Delta_k$.
+                \EndIf 
+            \EndIf 
             \State Set $k = k+1$.
         \EndWhile
         \State \textbf{Return} $x_k$.
     \end{algorithmic}
 \end{algorithm}
-The statements about the termination of quadratic functions and the generation of good approximations known from the Euclidean case have not yet been transferred to the Riemannian setup. Nevertheless, we can make the bold assumption that this is feasible under reasonable assumptions.  
+
+
+\begin{assumption}[{\cite[assumptions~(A1)+(A3)]{ByrdKhalfanSchnabel:1996}}]\label{RiemannianAssumptionsGlobalConvergence} \ \\[-1.5\baselineskip]
+    \begin{enumerate}
+        \item The sequence of iterates does not terminate and remains in a closed, bounded, convex set $D$ on which the function $f$ is twice continuously differentiable and in which $f$ has a unique stationary point $x^*$, i.e. $\nabla f(x^*) = 0$. The Hessian $\nabla^2 f(x^*)$ is positive definite, and $\nabla^2 f(x)$ is Lipschitz continuous in a neighborhood of $x^*$; that is, there exists a constant $\gamma > 0$ such that for all $x, y$ in some neighborhood of $x^*$ \begin{equation*} \lVert \nabla^2 f(x) - \nabla^2 f(y) \rVert \geq \gamma \ \lVert x - y \rVert. \end{equation*}
+        \item The sequence of matrices $\{ H^{\mathrm{SR1}}_k \}_k$ is bounded by a constant $M$ such that $\lVert H^{\mathrm{SR1}}_k \rVert \leq M$ for all $k$.
+    \end{enumerate}
+\end{assumption}
+
+\begin{theorem}[{\cite[Theorem~3.1]{HuangAbsilGallivan:2014}}] \label{RiemannianGlobalConvergence}
+    \begin{enumerate}
+        \item If $f \in C^2$ is bounded below on the sublevel set $\Omega$, Assumption 3.1 holds, condition (8) holds, and (7) is satisfied then $\lim_{k \rightarrow \infty} \operatorname{grad} f(x_k) = 0$.
+        \item If $f \in C^2$, $\mathcal{M}$ is compact, Assumption 3.1 holds, and (8) holds then $\lim_{k \rightarrow \infty} \operatorname{grad} f(x_k) = 0$, $\{ x_k \}_k$ has at least one limit point, and every limit point of $\{ x_k \}_k$ is a stationary point of $f$.
+        \item $f \in C^2$, the sublevel set $\Omega$ is compact, $f$ has a unique stationary point $x^*$ in $\Omega$, Assumption 3.1 holds, condition (8) holds, and (7) is satisfied then $\{ x_k \}_k$ converges to $x^*$.
+    \end{enumerate}
+\end{theorem}
+
+\begin{assumption}[{\cite[assumptions~(A1)+(A3)]{ByrdKhalfanSchnabel:1996}}]\label{RiemannianAssumptionsLocalConvergence} \ \\[-1.5\baselineskip]
+    \begin{enumerate}
+        \item The sequence of matrices $\{ H^{\mathrm{SR1}}_k \}_k$ is generated from each iterate $x_k$ by \cref{directSR1formula}, using $s_k$, and for each iteration \cref{safeguard} holds, where $\nu \in (0, 1)$ is a constant.
+        \item The trust-region subproblem \cref{trsubproblem} is solved accurately enough that for all $k$ \begin{equation*} -(\nabla f(x_k)^{\mathrm{T}} s + \frac{1}{2} s^{\mathrm{T}} H^{\mathrm{SR1}}_k s) \geq \sigma_1 \ \lVert \nabla f(x_k) \rVert \ \min \{ \Delta_k, \sigma_2 \ \frac{\lVert \nabla f(x_k) \rVert}{\lVert H^{\mathrm{SR1}}_k \rVert} \} \end{equation*} for positive constants $\sigma_1$ and $\sigma_2$ and such that whenever $\lVert s_k \rVert < 0.8 \ \Delta_k$, then $H^{\mathrm{SR1}}_k s_k = - \nabla f(x_k)$.
+    \end{enumerate}
+\end{assumption}
+
+\begin{theorem}[{\cite[Theorem~2.7.]{ByrdKhalfanSchnabel:1996}}] \label{RiemannianLocalConvergence}
+    Consider \cref{TR-SR1Method} and suppose that \cref{AssumptionsGlobalConvergence} and \cref{AssumptionsLocalConvergence} hold. Then the sequence $\{ x_k \}_k$ generated by \cref{TR-SR1Method} converges $n+l$-step superlinear, i.e. 
+    \begin{equation}\label{n+1superlinear}
+        \lim_{k \rightarrow \infty} \frac{\lVert x_{k+n+1} - x^* \rVert}{\lVert x_k - x^* \rVert} = 0.
+    \end{equation}
+\end{theorem}
