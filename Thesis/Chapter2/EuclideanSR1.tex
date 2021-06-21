@@ -6,58 +6,54 @@ In the Euclidean optimization a key problem is minimizing a real-valued function
 \end{equation}  
 where $f \colon \; \mathbb{R}^n \to \mathbb{R}$ is a smooth function. In this chapter we focus on smooth functions, by which we generally mean functions whose second derivatives exist and are continuous or formally $f \in C^2(\mathbb{R}^n)$, unless otherwise stated. \cref{OptimizationProblem} is called a (nonlinear) unconstrained optimization problem. \\
 The Trust-region method is one of the most important numerical optimization methods in solving \cref{OptimizationProblem}. At each iterate $x_k$, we first define a qudratic model 
-
 \begin{equation}\label{QudraticModel}
     m_k(s) = f(x_k) + \nabla f(x_k)^{\mathrm{T}} s + \frac{1}{2} s^{\mathrm{T}} H_k s,
 \end{equation}
-
 where $\nabla f(x_k)$ denotes the gradient of the objective function $f$ at the current iterate $x_k$ and $H_k \in  \mathbb{R}^{n \times n}$ is a symmetric matrix. The difference between \cref{QudraticModel} and the objective function is $\mathcal{O}(\lVert s \rVert^{2}_2)$, which is small when $\lVert s \rVert_2$ is small. If $H_k$ is equal to the true Hessian $\nabla^2 f(x_k)$ at the current iterate, the approximation error in the model $m_k$ is $\mathcal{O}(\lVert s \rVert^{3}_2)$, so this model is especially accurate when $\lVert s \rVert_2$ is small. This choice $H_k = \nabla^2 f(x_k)$ leads to the trust-region Newton method \cite[p.~68]{NocedalWright:2006}. \\
 Nevertheless, the model \cref{QudraticModel} is easier to handle than the objective function $f$ and its purpose is to approximate $f$ within a suitable neighbourhood of the current iterate $x_k$, which we refer to as the trust-region. The trust-region is the set of all points
-
 \begin{equation}\label{TrustRegion}
     \{ x \in \mathbb{R}^n \colon \ \lVert x - x_k \rVert_2 \leq \Delta_k \}
 \end{equation}
-
 where $\Delta_k > 0$ is the trust-region radius \cite[p.~115]{ConnGouldToint:2000}. The region \cref{TrustRegion} is so called because we trust the model \cref{QudraticModel} to be a faithful representation of the objective function only in this region \cite[p.~2]{ConnGouldToint:2000}. \\
-Given th3 model \cref{QudraticModel} and its trust-region \cref{TrustRegion}, we next seek a step $s_k$ with the aim of reducing the model \cref{QudraticModel} while satisfying the bound $\lVert s_k \rVert_2 \leq \Delta_k$, this means in each iteration we compute the minimizer of the so-called Trust-region subproblem
-
+Given the model \cref{QudraticModel} and its trust-region \cref{TrustRegion}, we next seek a step $s_k$ with the aim of reducing the model \cref{QudraticModel} while satisfying the bound $\lVert s_k \rVert_2 \leq \Delta_k$, this means in each iteration we compute the minimizer of the so-called Trust-region subproblem
 \begin{equation}\label{trsubproblem}
     s_k = \arg \min_{\lVert s \rVert_2 \leq \Delta_k} m_k(s) = \arg \min_{\lVert s \rVert_2 \leq \Delta_k} f(x_k) + \nabla f(x_k)^{\mathrm{T}} s + \frac{1}{2} s^{\mathrm{T}} H_k s.
 \end{equation}
-
 In general, the step $s_k$ is just a approximate solution to \cref{trsubproblem}, which is required to be accurate enough that for all $k$
-
 \begin{equation}\label{accuracy1}
-    -(\nabla f(x_k)^{\mathrm{T}} s + \frac{1}{2} s^{\mathrm{T}} H^{\mathrm{SR1}}_k s) \geq \sigma_1 \ \lVert \nabla f(x_k) \rVert \ \min \{ \Delta_k, \sigma_2 \ \frac{\lVert \nabla f(x_k) \rVert}{\lVert H^{\mathrm{SR1}}_k \rVert} \} 
+    -(\nabla f(x_k)^{\mathrm{T}} s + \frac{1}{2} s^{\mathrm{T}} H_k s) \geq \sigma_1 \ \lVert \nabla f(x_k) \rVert \ \min \{ \Delta_k, \sigma_2 \ \frac{\lVert \nabla f(x_k) \rVert}{\lVert H_k \rVert} \} 
 \end{equation} 
-
 for positive constants $\sigma_1$ and $\sigma_2$ and such that 
-
 \begin{equation}\label{accuracy2}
-    \text{whenever } \lVert s_k \rVert < 0.8 \ \Delta_k, \text{ then } H^{\mathrm{SR1}}_k s_k = - \nabla f(x_k).
+    \text{whenever } \lVert s_k \rVert < 0.8 \ \Delta_k, \text{ then } H_k s_k = - \nabla f(x_k).
 \end{equation}
+These conditions are satisfied if \cref{trsubproblem} is solved exactly and are satisfied by most approximate trust-region strategies that are used in practice \cite[p.~1027]{ByrdKhalfanSchnabel:1996}. A standard method for this is the so-called truncated conjugate-gradient method, which is an “inverse-free” algorithm, as it only uses $H_k$, that achieves at least as much reduction in the model $m_k$ as the reduction achieved by the so-called Cauchy point (see \cite[4.1~Algorithms~based~on~the~cauchy~point]{NocedalWright:2006}). This point is simply the minimizer of $m_k$ along the steepest descent direction $- \nabla f(x_k)$ subject to the trust-region bound \cite[p.~71]{NocedalWright:2006}. \\
+Having determined the step $s_k$, we get the candidate for the next iterate by adding it to the current iterate $x_k$, i.e. we compute 
+\begin{equation}\label{candidate}
+    \widetilde{x}_{k+1} = x_k + s_k.
+\end{equation}
+We are only talking about a candidate because we make the acceptance of $\widetilde{x}_{k+1}$ as the next iterate $x_{k+1}$ dependent on the agreement between the objective function $f$ and the quadratic model $m_k$ for the step $s_k$. For that we compute at each iteration the value
+\begin{equation}\label{agreement}
+    \rho_k = \frac{f(x_k) - f(x_k + s_k)}{m_k(0) - m_k(s_k)} = \frac{f(x_k) - f(\widetilde{x}_{k+1})}{m_k(0) - m_k(s_k)},
+\end{equation}
+the numerator is called the actual reduction, and the denominator is the predicted reduction (that is, the reduction in $f$ predicted by the model $m_k$). We point out that since the step $s_k$ is obtained by minimizing the model $m_k$ over a region that includes $s = 0$, the predicted reduction will always be nonnegative. Hence, if $\rho_k$ is negative, the new objective value $f(x_k + s_k)$ is greater than the current value $f(x_k)$, so the step must be rejected \cite[p.~68-69]{NocedalWright:2006}. In general, the candidate $\widetilde{x}_{k+1}$ is accepted as the next iterate $x_{k+1}$ if $\rho_k$ is greater than a chosen constant $\rho^{\prime} \in [0 , \frac{1}{4})$. \\
+At the end of each iteration, the trust-region radius $\Delta_k$ is updated. There are diverse heuristics for this, which in general base this choice on $\rho_k$ and the norm of the step $s_k$. We consider the strategy of downsizing the trust-region radius, i.e. $\Delta_{k+1} < \Delta_k$, if $\rho_k$ is less than $0.1$, which indicates that the model $m_k$ in the current trust-region poorly represents the objective function $f$, and increasing the trust-region radius, i.e. $\Delta_{k+1} > \Delta_k$, if $\rho_k$ is greater than $0.75$ and the norm of $s_k$ is greater than or equal to $0.8 \ \Delta_k$, indicating that the model $m_k$ represents the objective function $f$ well enough in the current trust-region and and the current step $s_k$ is pretty close to the boundary of the current trust-region. \\
+The size of the trust-region is critical to the effectiveness of each step. If the region is too small, the algorithm misses an opportunity to take a substantial step that will move it much closer to the minimizer of the objective function. If too large, the minimizer of the model may be far from the minimizer of the objective function in the region, so we may have to reduce the size of the region and try again. In general, the direction of the step changes whenever the size of the trust-region is altered. \cite[p.~67]{NocedalWright:2006}. \\
 
-These conditions are satisfied if \cref{trsubproblem} is solved exactly or by using 
-
-Having determined the trial step, the objective function is now computed
-at xk + sk and compared to the value predicted by the model at this point, that is,
-mk(xk + sk).
-
-
-
-
-
-
-The matrix $H_k \in \mathbb{R}^{n \times n}$ approximates the action of the objective's Hessian $\nabla^{2} f(\cdot)$ at the current iterate $x_k$ in the direction of $s_k$. These matrices are not calculated anew in each iteration, but $H_k$ is updated to a new matrix $H_{k+1} \in \mathbb{R}^{n \times n}$ using the information about the curvature of the objective function $f$ obtained during the iteration. It is required that the matrix $H_{k+1}$ generated by the update fulfills the so-called quasi-Newton equation, which reads as 
-\begin{equation*}
-    H_{k+1} (x_{k+1} - x_k) = \nabla f(x_{k+1}) - \nabla f(x_k).
-\end{equation*}
-For the sake of simplicity, we introduce the notations $s_k = x_{k+1} - x_k \in \mathbb{R}^n$ and $y_k = \nabla f(x_{k+1}) - \nabla f(x_k) \in \mathbb{R}^n$, thus we obtain
+Let us now turn to the convergence results that can be achieved by this class of numerical methods. These depend (among other things) on the quadratic term $H_k$ in our model $m_k$. As already mentioned, a possible choice would be the Hessian matrix, i.e. $H_k = \nabla^2 f(x_k)$. If the iterates $\{ x_k \}_k$ generated by the rsulting algorithm converge to a point $x^*$ satisfying second-order sufficient conditions, it can be shown that the rate of convergence is superlinear (see \cite[4.4~Local~convergence~of~trust-region~Newton~methods]{NocedalWright:2006}). \\
+But in practice there are cases where the Hessian matrix of the objective function is too costly to calculate, or even does not exist at all. Therefore, one is interested in an approximation of the second derivative of the objective function, and there are various approaches for this. \\
+If one considers Euclidean line search methods, then the so-called quasi-Newton methods provide a promising approach. These methods are based on Newton's method, which means that they also want to minimise the model of the objective function, but now without the restriction of the trust-region, and consequently obtain the search direction $s_k$ by solving the linear system of equations $H_k s_k = - \nabla f(x_k)$. Here the matrix $H_k \in \mathbb{R}^{n \times n}$ approximates the action of the objective's Hessian $\nabla^{2} f(x_k)$ at the current iterate in the direction of $s_k$. After the next iterate in this class of line search methods is calculated, i.e. $x_{k+1} = x_k + \alpha_k s_k$ ($\alpha_k$ is the step size calculated in the meantime), this matrix $H_k$ is not calculated anew in each iteration, but $H_k$ is updated to a new matrix $H_{k+1} \in \mathbb{R}^{n \times n}$ using the information about the curvature of the objective function $f$ obtained by the difference of the iterates, which is given by the step $s_k = x_{k+1} - x_k \in \mathbb{R}^n$, and the difference of the gradients at the iterates, which we denote by $y_k = \nabla f(x_{k+1}) - \nabla f(x_k) \in \mathbb{R}^n$. It is required that the new matrix $H_{k+1}$ generated by the update fulfills the so-called quasi-Newton equation, which reads as 
 \begin{equation}\label{quasi-NewtonEquation}
-    H_{k+1} s_k = y_k.
+    H_{k+1} (x_{k+1} - x_k) = \nabla f(x_{k+1}) - \nabla f(x_k) \text{ or } H_{k+1} s_k = y_k.
 \end{equation}
 The fact that the matrix $H_{k+1}$ satisfies the quasi-Newton equation, \cref{quasi-NewtonEquation}, is the distinguishing feature of quasi-Newton methods. \\
-The idea now is to find a convenient formula, which requires at most the evaluation of the gradient $\nabla f(\cdot)$ of the objective function at each iterate, for updating the matrix $H_k$ to a new matrix $H_{k+1}$, which satisfies the quasi-Newton equation \cref{quasi-NewtonEquation}. Instead of recomputing $H_{k+1}$ from scratch at every iteration, we apply a simple modification that combines the most recently observed information about the objective function with the existing knowledge embedded in $H_k$ or $B_k$ \cite[p.~139]{NocedalWright:2006}. \\
+
+But there is also a simpler rank-one update that maintains symmetry of the matrix $H_k$ or $B_k$ and satisfies the quasi-Newton equation \cref{quasi-NewtonEquation}. Unlike the rank-two BFGS update, this symmetric rank-one, or short SR1, update does not guarantee that the updated matrix $H_{k+1}$ or $B_{k+1}$ maintains positive definiteness. Nevertheless good numerical results have been obtained with algorithms based on SR1, therefore we now show a possible derivation of this formula, which is so simple that it has been rediscovered a number of times. \\
+
+
+The idea now is to find a convenient formula, for updating the matrix $H_k$ to a new matrix $H_{k+1}$, which satisfies the quasi-Newton equation \cref{quasi-NewtonEquation}. Instead of recomputing $H_{k+1}$ from scratch at every iteration, we apply a simple modification that combines the most recently observed information about the objective function with the existing knowledge embedded in $H_k$ or $B_k$ \cite[p.~139]{NocedalWright:2006}. 
+
+
 
 But there is also a simpler rank-one update that maintains symmetry of the matrix $H_k$ or $B_k$ and satisfies the quasi-Newton equation \cref{quasi-NewtonEquation}. Unlike the rank-two BFGS update, this symmetric rank-one, or short SR1, update does not guarantee that the updated matrix $H_{k+1}$ or $B_{k+1}$ maintains positive definiteness. Nevertheless good numerical results have been obtained with algorithms based on SR1, therefore we now show a possible derivation of this formula, which is so simple that it has been rediscovered a number of times. \\
 A general symmetric rank-one update has the form
@@ -82,7 +78,11 @@ Hence, the only symmetric rank-one update formula that satisfies the quasi-Newto
 \end{equation}
 
 It is easy to see in that even if $H^\mathrm{SR1}_k$ is positive definite, $H^\mathrm{SR1}_{k+1}$ may not have the same property (this holds also for $B^\mathrm{SR1}_k$ and $B^\mathrm{SR1}_{k+1}$). If and only if $(y_k - H^\mathrm{SR1}_k s_k)^{\mathrm{T}} s_k > 0$, the SR1 update retains positive definiteness. However, this condition is difficult to guarantee. This means that $H^\mathrm{SR1}_{k+1}$ or $B^\mathrm{SR1}_{k+1}$ may no longer be invertible. Moreover, $d_{k+1} = -{H^\mathrm{SR1}_{k+1}}^{-1} \nabla f(x_{k+1}) = -B^\mathrm{SR1}_{k+1} \nabla f(x_{k+1})$ is not necessarily a descent direction. \\
+
+
 The main drawback of the SR1 update formula is that the denominator in \cref{directSR1formula} can vanish. In fact, even when the objective function $f$ is convex and quadratic, there may be steps on which there is no symmetric rank-one update that satisfies the quasi-Newton equation \cref{quasi-NewtonEquation}. This disadvantage results in serious numerical difficulties, which restrict the applications of it. Nevertheless, the SR1 update formula has the following advantages:
+
+
 For the vanishing denominator in \cref{directSR1formula} we introduce a strategy to prevent a method using the SR1 update from breaking down. It has been observed in practice that it performs well simply by skipping the update if the denominator is small. More specifically, the update \cref{directSR1formula} is applied only if 
 \begin{equation}\label{safeguard}
     \lvert (y_k - H^\mathrm{SR1}_k s_k)^{\mathrm{T}} s_k \lvert \; \geq \; \nu \; \lVert s_k \rVert \lVert y_k - H^\mathrm{SR1}_k s_k \rVert 
@@ -93,18 +93,7 @@ holds, where $\nu \in (0, 1)$ is a small number, e.g. $r = 10^{−8}$. Most impl
 
 
 
-One of the key ingredients in a trust-region algorithm is the strategy for choosing the trust-region radius $\Delta_k$ at each iteration. We base this choice on the agreement between the model $m_k$ and the objective function $f$ at previous iterations. Given a step $s_k$ we define the ratio
 
-\begin{equation}\label{agreement}
-    \rho_k = \frac{f(x_k) - f(x_k + s_k)}{m_k(0) - m_k(s_k)} = \frac{f(x_k) - f(\widetilde{x}_{k+1})}{m_k(0) - m_k(s_k)},
-\end{equation}
-
-the numerator is called the actual reduction, and the denominator is the predicted reduction (that is, the reduction in $f$ predicted by the model). Note that since the step $s_k$ is obtained by minimizing the model $m_k$ over a region that includes $s = 0$, the predicted reduction will always be nonnegative. Hence, if $\rho_k$ is negative, the new objective value $f(x_k + s_k)$ is greater than the current value $f(x_k)$, so the step must be rejected \cite[p.~68-69]{NocedalWright:2006}.
-
-If $\rho_k$ is close to $1$, this indicates that the quadratic model represents the objective function $f$ well enough and the trust-region radius may be increased. If, on the other hand, this ratio is smaller than a
-prescribed small number, the size of the trust-region is reduced \cite[p.~1027]{ByrdKhalfanSchnabel:1996}. 
-
-The size of the trust-region is critical to the effectiveness of each step. If the region is too small, the algorithm misses an opportunity to take a substantial step that will move it much closer to the minimizer of the objective function. If too large, the minimizer of the model may be far from the minimizer of the objective function in the region, so we may have to reduce the size of the region and try again. In practical algorithms, we choose the size of the region according to the performance of the algorithm during previous iterations. If the model is consistently reliable, producing good steps and accurately predicting the behavior of the objective function along these steps, the size of the trust-region may be increased to allow longer, more ambitious, steps to be taken. A failed step is an indication that our model is an inadequate representation of the objective function over the current trust-region. After such a step, we reduce the size of the region and try again \cite[p.~67]{NocedalWright:2006}.
 
 \begin{algorithm}[H]
     \caption{Trust-Region Symmetric Rank-One Method}\label{TR-SR1Method}
@@ -125,7 +114,7 @@ The size of the trust-region is critical to the effectiveness of each step. If t
 				\State Set $x_{k+1} = x_k$.
             \EndIf 
             \If{$\rho_k > 0.75$}
-                \If{$\lVert s_k \rVert \geq 0.8 \ \Delta_k$}
+                \If{$\lVert s_k \rVert_2 \geq 0.8 \ \Delta_k$}
                     \State Set $\Delta_{k+1} = \tau_2 \ \Delta_k$.
                 \Else 
                     \State Set $\Delta_{k+1} = \Delta_k$.
