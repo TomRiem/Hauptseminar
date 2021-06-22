@@ -11,7 +11,7 @@ where $v \in \mathbb{R}^n$ and $\sigma \in \{-1,1\}$. The task now is to determi
 \begin{equation}
     H_k s_k + [\sigma \, v^{\mathrm{T}} s_k] v = y_k.
 \end{equation}
-Since $[\sigma \, v^{\mathrm{T}} s_k]$ is a scalar, $v$ must be a multiple of $y_k − H_k s_k$, i.e. $v = \delta (y_k − H_k s_k)$ for some $\delta \in \mathbb{R}$. By substituting this form of $v$ into \cref{Derivation1}, we obtain
+Since $[\sigma \, v^{\mathrm{T}} s_k]$ is a scalar, $v$ must be a multiple of $y_k − H_k s_k$, i.e. $v = \delta (y_k − H_k s_k)$ for some $\delta \in \mathbb{R}$. By substituting this form of $v$ into , we obtain
 \begin{equation}
     (y_k − H_k s_k) = \sigma \, \delta^2 \, [s^{\mathrm{T}}_k (y_k − H_k s_k)](y_k − H_k s_k),
 \end{equation}
@@ -52,20 +52,20 @@ holds, where $g_{x_{k+1}}(\cdot, \cdot) \colon \; \tangent{x_{k+1}} \times \tang
 \begin{algorithm}[H]
     \caption{Riemannian Trust-Region Symmetric Rank-One Method}\label{RTR-SR1Method}
     \begin{algorithmic}[1]
-        \State Riemannian manifold $(\mathcal{M}, g)$; isometric vector transport $\vectorTransportSymbol^S$ with $\retractionSymbol$ as associated retraction; continuously differentiable real-valued function $f$ on $\mathcal{M}$, bounded below; initial iterate $x_0 \in \mathcal{M}$; initial self-adjoint operator $\mathcal{H}^{SR1}_0 \colon \; \tangent{x_0} \to \tangent{x_0}$; initial trust-region radius $\Delta_0 > 0$; safeguard constant $\nu \in (0,1)$; rejection boundary $\rho^{\prime} \in (0, 0.1)$; trust-region reduction factor $\tau_1 \in (0,1)$; trust-region magnification factor $\tau_2 > 1$; convergence tolerance $\varepsilon > 0$. Set $k = 0$.
+        \State Riemannian manifold $(\mathcal{M}, g)$; isometric vector transport $\vectorTransportSymbol^S$ with $\retractionSymbol$ as associated retraction; continuously differentiable real-valued function $f$ on $\mathcal{M}$, bounded below; initial iterate $x_0 \in \mathcal{M}$; initial self-adjoint operator $\mathcal{H}^\mathrm{SR1}_0 \colon \; \tangent{x_0} \to \tangent{x_0}$; initial trust-region radius $\Delta_0 > 0$; safeguard constant $\nu \in (0,1)$; rejection boundary $\rho^{\prime} \in (0, 0.1)$; trust-region reduction factor $\tau_1 \in (0,1)$; trust-region magnification factor $\tau_2 > 1$; convergence tolerance $\varepsilon > 0$. Set $k = 0$.
         \While{$\lVert \nabla f(x_k) \rVert > \varepsilon$}
-            \State Obtain $s_k$ (approximately) solving \cref{Riemanniantrsubproblem} using $\mathcal{H}^{SR1}_k$.
+            \State Obtain $s_k$ (approximately) solving \cref{Riemanniantrsubproblem} using $\mathcal{H}^\mathrm{SR1}_k$.
             \State Set $\widetilde{x}_{k+1} = \retract{x_k}(s_k)$ and ${T^{S}_{x_k, s_k}}^{-1} ( \operatorname{grad}f(\widetilde{x}_{k+1}) ) - \operatorname{grad}f(x_k) \in \tangent{x_k}$.
             \If{\cref{RiemannianSafeguard} holds}
-                \State Compute $\widetilde{\mathcal{H}}^{SR1}_{k+1} \colon \tangent{x_{k}} \to \tangent{x_{k}}$ by means of \cref{RiemannianDirectSR1formula}.
+                \State Compute $\widetilde{\mathcal{H}}^\mathrm{SR1}_{k+1} \colon \tangent{x_{k}} \to \tangent{x_{k}}$ by means of \cref{RiemannianDirectSR1formula}.
 			\Else 
-				\State Set $\widetilde{\mathcal{H}}^{SR1}_{k+1} = \mathcal{H}^{SR1}_k$.
+				\State Set $\widetilde{\mathcal{H}}^\mathrm{SR1}_{k+1} = \mathcal{H}^\mathrm{SR1}_k$.
             \EndIf 
             \State Compute $\rho_k = \frac{f(x_k) - f(\widetilde{x}_{k+1})}{m_k(0) - m_k(s_k)}$.
             \If{$\rho_k > \rho^{\prime}$}
-                \State Set $x_{k+1} = \widetilde{x}_{k+1}$ and $\mathcal{H}^{SR1}_{k+1} = T^{S}_{x_k, s_k} \circ \widetilde{\mathcal{H}}^{SR1}_{k+1} \circ  {T^{S}_{x_k, s_k}}^{-1} \colon \tangent{x_{k+1}} \to \tangent{x_{k+1}}$.
+                \State Set $x_{k+1} = \widetilde{x}_{k+1}$ and $\mathcal{H}^\mathrm{SR1}_{k+1} = T^{S}_{x_k, s_k} \circ \widetilde{\mathcal{H}}^\mathrm{SR1}_{k+1} \circ  {T^{S}_{x_k, s_k}}^{-1} \colon \tangent{x_{k+1}} \to \tangent{x_{k+1}}$.
 			\Else 
-				\State Set $x_{k+1} = x_k$ and $\mathcal{H}^{SR1}_{k+1} = \widetilde{\mathcal{H}}^{SR1}_{k+1} \colon \tangent{x_{k}} \to \tangent{x_{k}}$.
+				\State Set $x_{k+1} = x_k$ and $\mathcal{H}^\mathrm{SR1}_{k+1} = \widetilde{\mathcal{H}}^\mathrm{SR1}_{k+1} \colon \tangent{x_{k}} \to \tangent{x_{k}}$.
             \EndIf 
             \If{$\rho_k > 0.75$}
                 \If{$\lVert s_k \rVert \geq 0.8 \ \Delta_k$}
@@ -86,32 +86,60 @@ holds, where $g_{x_{k+1}}(\cdot, \cdot) \colon \; \tangent{x_{k+1}} \times \tang
     \end{algorithmic}
 \end{algorithm}
 
+Moreover, we assume throughout that $f \in C^2$.
 
-\begin{assumption}[{\cite[assumptions~(A1)+(A3)]{ByrdKhalfanSchnabel:1996}}]\label{RiemannianAssumptionsGlobalConvergence} \ \\[-1.5\baselineskip]
-    \begin{enumerate}
-        \item The sequence of iterates does not terminate and remains in a closed, bounded, convex set $D$ on which the function $f$ is twice continuously differentiable and in which $f$ has a unique stationary point $x^*$, i.e. $\nabla f(x^*) = 0$. The Hessian $\nabla^2 f(x^*)$ is positive definite, and $\nabla^2 f(x)$ is Lipschitz continuous in a neighborhood of $x^*$; that is, there exists a constant $\gamma > 0$ such that for all $x, y$ in some neighborhood of $x^*$ \begin{equation*} \lVert \nabla^2 f(x) - \nabla^2 f(y) \rVert \geq \gamma \ \lVert x - y \rVert. \end{equation*}
-        \item The sequence of matrices $\{ H^{\mathrm{SR1}}_k \}_k$ is bounded by a constant $M$ such that $\lVert H^{\mathrm{SR1}}_k \rVert \leq M$ for all $k$.
-    \end{enumerate}
+We let $\Omega$ denote the sublevel set of $x_0$, i.e.,
+\begin{equation*}
+    \Omega = \{ x \in \mathcal{M} \colon \ f(x) \leq f(x_0) \}.
+\end{equation*}
+
+In some results, we will assume for the retraction $\retractionSymbol$ that there exists $\mu > 0$ and $\delta_{\mu} > 0$ such that
+\begin{equation}\label{RetractionAssumption}
+    \lVert \xi_x \rVert_x \geq \mu \ \operatorname{dist}(x, \retract{x}(\xi_x)) \text{ for all } x \in \Omega, \text{ for all } \xi_x \in \tangent{x}, \ \lVert \xi_x \rVert_x \leq \delta_{\mu}.
+\end{equation}
+Such a condition is instrumental in the global convergence analysis of Riemannian trust-region schemes.
+
+We will often require that the trust-region subproblem is solved accurately enough that, for positive constants $\sigma_1$ and $\sigma_2$,
+\begin{equation}\label{RiemannianAccuracy1}
+    m_k(0_{x_k}) - m_k(s_k) \geq \sigma_1 \ \lVert \operatorname{grad} f(x_k) \rVert_{x_k} \ \min \{ \Delta_k, \sigma_2 \ \frac{\lVert \operatorname{grad} f(x_k) \rVert_{x_k}}{\lVert \mathcal{H}_k \rVert} \}
+\end{equation} 
+and that
+\begin{equation}\label{RiemannianAccuracy2}
+    \mathcal{H}_k [s_k] = - \operatorname{grad} f(x_k) + \delta_k \text{ with } \delta_k \in \tangent{x_k}, \ \lVert \delta_k \rVert_{x_k} \leq \lVert \operatorname{grad} f(x_k) \rVert^{1 + \theta}_{x_k}, \text{ whenever } \lVert s_k \rVert_{x_k} < 0.8 \ \Delta_k,
+\end{equation}
+where $\theta > 0$ is a constant. These conditions are generalizations of \cref{accuracy1} and \cref{accuracy2}. The condition \cref{RiemannianAccuracy2} remains weaker than condition \cref{accuracy2}. The purpose of introducing $\delta_k$ in \cref{RiemannianAccuracy2} is to encompass stopping criteria such as \cite[(7.10)]{AbsilMahonySepulchre:2008} that do not require the computation of an exact solution of the trust-region subproblem. We point out in particular that \cref{RiemannianAccuracy1} and \cref{RiemannianAccuracy2} hold if the approximate solution of the trust-region subproblem is obtained from the truncated CG method, described in \cite[§~7.3.2]{AbsilMahonySepulchre:2008} in the Riemannian context.
+
+
+\begin{assumption}[{\cite[Assumption~3.1]{HuangAbsilGallivan:2014}}]\label{RiemannianAssumptionsGlobalConvergence} 
+    The sequence of linear operators $\{ \mathcal{H}^{\mathrm{SR1}}_k \}_k$ is bounded by a constant $M$ such that $\lVert \mathcal{H}^{\mathrm{SR1}}_k \rVert \leq M$ for all $k$.
 \end{assumption}
 
 \begin{theorem}[{\cite[Theorem~3.1]{HuangAbsilGallivan:2014}}] \label{RiemannianGlobalConvergence}
     \begin{enumerate}
-        \item If $f \in C^2$ is bounded below on the sublevel set $\Omega$, Assumption 3.1 holds, condition (8) holds, and (7) is satisfied then $\lim_{k \rightarrow \infty} \operatorname{grad} f(x_k) = 0$.
-        \item If $f \in C^2$, $\mathcal{M}$ is compact, Assumption 3.1 holds, and (8) holds then $\lim_{k \rightarrow \infty} \operatorname{grad} f(x_k) = 0$, $\{ x_k \}_k$ has at least one limit point, and every limit point of $\{ x_k \}_k$ is a stationary point of $f$.
-        \item $f \in C^2$, the sublevel set $\Omega$ is compact, $f$ has a unique stationary point $x^*$ in $\Omega$, Assumption 3.1 holds, condition (8) holds, and (7) is satisfied then $\{ x_k \}_k$ converges to $x^*$.
+        \item If $f$ is bounded below on the sublevel set $\Omega$, \cref{RiemannianAssumptionsGlobalConvergence} holds, condition \cref{RiemannianAccuracy1} holds, and \cref{RetractionAssumption} is satisfied then $\lim_{k \rightarrow \infty} \operatorname{grad} f(x_k) = 0$.
+        \item If $\mathcal{M}$ is compact, Assumption 3.1 holds, and \cref{RiemannianAccuracy1} holds then $\lim_{k \rightarrow \infty} \operatorname{grad} f(x_k) = 0$, $\{ x_k \}_k$ has at least one limit point, and every limit point of $\{ x_k \}_k$ is a stationary point of $f$.
+        \item If the sublevel set $\Omega$ is compact, $f$ has a unique stationary point $x^*$ in $\Omega$, Assumption 3.1 holds, condition \cref{RiemannianAccuracy1} holds, and \cref{RetractionAssumption} is satisfied then $\{ x_k \}_k$ converges to $x^*$.
     \end{enumerate}
 \end{theorem}
 
-\begin{assumption}[{\cite[assumptions~(A1)+(A3)]{ByrdKhalfanSchnabel:1996}}]\label{RiemannianAssumptionsLocalConvergence} \ \\[-1.5\baselineskip]
+
+
+
+\begin{assumption}[{\cite[Assumptions~3.2+3.3+3.4+3.5+3.6]{HuangAbsilGallivan:2014}}]\label{RiemannianAssumptionsLocalConvergence} \ \\[-1.5\baselineskip]
     \begin{enumerate}
-        \item The sequence of matrices $\{ H^{\mathrm{SR1}}_k \}_k$ is generated from each iterate $x_k$ by \cref{directSR1formula}, using $s_k$, and for each iteration \cref{safeguard} holds, where $\nu \in (0, 1)$ is a constant.
-        \item The trust-region subproblem \cref{trsubproblem} is solved accurately enough that for all $k$ \begin{equation*} -(\nabla f(x_k)^{\mathrm{T}} s + \frac{1}{2} s^{\mathrm{T}} H^{\mathrm{SR1}}_k s) \geq \sigma_1 \ \lVert \nabla f(x_k) \rVert \ \min \{ \Delta_k, \sigma_2 \ \frac{\lVert \nabla f(x_k) \rVert}{\lVert H^{\mathrm{SR1}}_k \rVert} \} \end{equation*} for positive constants $\sigma_1$ and $\sigma_2$ and such that whenever $\lVert s_k \rVert < 0.8 \ \Delta_k$, then $H^{\mathrm{SR1}}_k s_k = - \nabla f(x_k)$.
+        \item We assume that $\{ x_k \}_k$ converges to a point $x^*$.
+        \item We let $\mathcal{U}_{trn}$ be a totally retractive neighborhood of $x^*$. This means that there is $\delta_{trn} > 0$ such that, for each $y \in \mathcal{U}_{trn}$, we have that $\retract{y}(\mathcal{B}(0_y, \delta_{trn})) \supseteq \mathcal{U}_{trn}$ and $\retract{y}(\cdot)$ is a diffeomorphism on $\mathcal{B}(0_y, \delta_{trn})$, where $\mathcal{B}(0_y, \delta_{trn})$ denotes the ball of radius $\delta_{trn}$ in $\tangent{y}$ centered at the origin $0_y$. We assume without loss of generality that $\{ x_k \}_k \subset \mathcal{U}_{trn}$.
+        \item The point $x^*$ is a nondegenerate local minimizer of $f$. In other words, $\operatorname{grad} f(x^*) = 0$ and $\operatorname{Hess} f(x^*)$ is positive definite.
+        \item There exists a constant $c$ such that for all $x, y \in \mathcal{U}_{trn}$, \begin{equation*} \lVert \operatorname{Hess} f(y) - \mathrm{T}^{S}_{x, \eta_x} \circ \operatorname{Hess} f(x) \circ {\mathrm{T}^{S}_{x, \eta_x}}^{-1} \rVert \leq c \ \operatorname{dist}(x,y), \end{equation*} where $\eta_x = {\retractionSymbol_{x}}^{-1}(y)$.
+        \item There exists a constant $c_0$ such that for all $x, y \in \mathcal{U}_{trn}$, all $\xi_x \in \tangent{x}$ with $\retract{x}(\xi_x) \in \mathcal{U}_{trn}$, and all $\xi_y \in \tangent{y}$ with $\retract{y}(\xi_y) \in \mathcal{U}_{trn}$, it holds that \begin{equation*} \lVert \operatorname{Hess} \hat{f}_y(\xi_y) - \mathrm{T}^{S}_{x, \eta_x} \circ \operatorname{Hess} \hat{f}_x(\xi_x) \circ {\mathrm{T}^{S}_{x, \eta_x}}^{-1} \rVert \leq c_0 \ (\lVert \xi_x \rVert_x + \lVert \xi_y \rVert_y + \lVert \eta_x \rVert_x), \end{equation*} where $\eta_x = {\retractionSymbol_{x}}^{-1}(y)$, $\hat{f}_x(\cdot) = f \circ \retract{x}(\cdot)$ and $\hat{f}_y(\cdot) = f \circ \retract{y}(\cdot)$.
+        \item For each iteration \cref{RiemannianSafeguard} holds.
+        \item There exists $N$ such that, for all $k \geq N$ and all $t \in [0, 1]$, it holds that $\retract{x_k}(t s_k) \in \mathcal{U}_{trn}$.
     \end{enumerate}
 \end{assumption}
 
-\begin{theorem}[{\cite[Theorem~2.7.]{ByrdKhalfanSchnabel:1996}}] \label{RiemannianLocalConvergence}
+\begin{theorem}[{\cite[Theorem~2.7.]{HuangAbsilGallivan:2014}}] \label{RiemannianLocalConvergence}
     Consider \cref{TR-SR1Method} and suppose that \cref{AssumptionsGlobalConvergence} and \cref{AssumptionsLocalConvergence} hold. Then the sequence $\{ x_k \}_k$ generated by \cref{TR-SR1Method} converges $n+l$-step superlinear, i.e. 
-    \begin{equation}\label{n+1superlinear}
+    \begin{equation}
         \lim_{k \rightarrow \infty} \frac{\lVert x_{k+n+1} - x^* \rVert}{\lVert x_k - x^* \rVert} = 0.
     \end{equation}
 \end{theorem}
