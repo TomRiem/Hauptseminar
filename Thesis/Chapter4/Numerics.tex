@@ -1,17 +1,29 @@
 \chapter{Numerics}
 
-To test the performance of the Riemannian SR1 quasi-Newton method, implemented in the package \lstinline!Manopt.jl!, we consider the Rayleigh quotient minimization problem on the sphere $\mathbb{S}^{n-1}$. For a symmetric matrix $A \in \mathbb{R}^{n \times n}$, the unit-norm eigenvector, $v \in \mathbb{R}^n$, corresponding to the smallest eigenvalue, defines the two global minima, $\pm v$, of the Rayleigh quotient  
+To test the performance of the Riemannian Trust-Region Symmetric Rank-One Method, implemented in the package \lstinline!Manopt.jl!, we consider the Rayleigh quotient minimization problem on the sphere $\mathbb{S}^{n-1}$. For a symmetric matrix $A \in \mathbb{R}^{n \times n}$, the unit-norm eigenvector, $v \in \mathbb{R}^n$, corresponding to the smallest eigenvalue, defines the two global minima, $\pm v$, of the Rayleigh quotient  
 \begin{equation}\label{RayleighQuotient}
     \begin{split}
         f \colon \; \mathbb{S}^{n-1} & \to \mathbb{R} \\
         x & \mapsto x^{\mathrm{T}} A x 
     \end{split}
 \end{equation}   
-with its gradient 
+with its Riemannian gradient 
 \begin{equation*}
-    \operatorname{grad} f(x) = 2(Ax - x x^{\mathrm{T}} A x).
+    \operatorname{grad} f(x) = 2(Ax - x x^{\mathrm{T}} A x),
 \end{equation*}
-To apply the RSR1 method, implemented in \lstinline!Manopt.jl!, to the optimization problem defined by the cost function \cref{RayleighQuotient} for $n=100$, \cref{RayleighCode} must be executed in Julia. The problem is defined by setting \lstinline!A_symm = ( A + A' ) / 2!, where the elements of \lstinline!A! are drawn from the standard normal distribution using Julia’s \lstinline!randn(n,n)! with seed \lstinline!42!. With \lstinline!random_point(M)!, a random point is created on the given manifold \lstinline!M!. The stopping criterion requires to abort the method, that either the norm of the gradient is less than $10^{-6}$ or $1000$ iterations have been run. \\
+and its Hessian operator
+\begin{equation}\label{RayleighHessian}
+    \operatorname{Hess} f(x) [\xi_x] = 2 (A \xi_x - x x^{\mathrm{T}} A \xi_x - \xi_x x^{\mathrm{T}} A x - x x^{\mathrm{T}} \xi_x x^{\mathrm{T}} A x).
+\end{equation}
+For the retraction $\retract{\cdot}(\cdot)$ on $\mathbb{S}^{n-1}$ we use the so-called retraction by projection, which is given by
+\begin{equation*}
+    \retract{x}(\xi_x) = \frac{x + \xi_x}{\lVert x + \xi_x \rVert_2},
+\end{equation*}
+and as isometric vector transport $\mathrm{T}^S$ on $\mathbb{S}^{n-1}$ we use the prarallel transport, which is given by 
+\begin{equation*}
+    \parallelTransportDir{x}{\eta_x}(\xi_x) = \xi_x - \frac{2 y^{\mathrm{T}} \xi_x}{\lVert x + y \rVert^{2}_2} (x + y), \text{ where } y = \retract{x}(\eta_x).
+\end{equation*}
+To apply the RTR-SR1 method, implemented in \lstinline!Manopt.jl!, to the optimization problem defined by the cost function \cref{RayleighQuotient} for $n=500$, \cref{RayleighCode} must be executed in Julia. The problem is defined by setting \lstinline!A_symm = ( A + A' ) / 2!, where the elements of \lstinline!A! are drawn from the standard normal distribution using Julia’s \lstinline!randn(n,n)! with seed \lstinline!42!. With \lstinline!random_point(M)!, a random point is generated on the given manifold \lstinline!M!. The stopping criterion requires to abort the method, that either the norm of the gradient is less than $10^{-6}$ or $500$ iterations have been run. \\
 \begin{lstlisting}[mathescape, caption={The Rayleigh quotient minimization experiment in Julia for $n = 500$.}, label={RayleighCode}]
     using Manopt, Manifolds, Random
     Random.seed!(42)
@@ -40,31 +52,30 @@ To apply the RSR1 method, implemented in \lstinline!Manopt.jl!, to the optimizat
     trust_region_radius = 1.0
     )
 \end{lstlisting}
-
-To test the performance, we execute an experiment in Julia, where \cref{RayleighCode} depending on the parameter \lstinline!n! is used. We compare the average number of iterations per call and the average time needed per call of the RSR1, the inverse RSR1, the RBFGS and the inverse RBFGS method, which are all implemented in the package \lstinline!Manopt.jl!. All methods follow the sequence of , only at the end the corresponding operator update of the method is used, i.e. the RBFGS method uses , the inverse RBFGS method uses , the RSR1 method uses  and the inverse RSR1 method uses . In all methods, a stepsize $\alpha_k > 0$ is determined in each iteration that fulfills  and , with $c_1 = 10^{−4}$ and $c_2 = 0.999$. The numerical experiment is implemented in the toolbox \lstinline!Manopt.jl!. It runs on a Lenovo ThinkPad L490, 64 bit Windows system, 1.8 Ghz Intel Core i7-8565U, 32 GB RAM, with Julia 1.5.2.
+To test the performance, we execute an experiment in Julia, where \cref{RayleighCode} depending on the parameter \lstinline!n! is used. We compare the average number of iterations per call, the average time needed per call and the average number of thousand allocations per call of the RTR-Newton method, which uses the true Hessian operator \cref{RayleighHessian} as quadratic term, and the RTR-SR1 method. Both methods use as inner iteration for solving the trust-region subproblem \cref{Riemanniantrsubproblem} a generalization of the truncated conjugate-gradient method for Riemannian manifolds, which follows the methodology of \cite[Algorithm~11]{AbsilMahonySepulchre:2008}. The parameters $\theta$ and $\kappa$ in the inner iteration stopping criterion \cite[(7.10)]{AbsilMahonySepulchre:2008} are set to $0.1, 0.9$ for RTR-SR1 and to $1, 0.1$ for RTR-Newton. The initial trust-region radius $\Delta_0$ is set to $1$, $r$ is the square root of machine epsilon, $\rho^{\prime}$ is set to $0.1$, $\tau_1$ to $0.25$, and $\tau_2$ to $2$. \\
+The numerical experiment is implemented in the toolbox \lstinline!Manopt.jl!. It runs on a Lenovo ThinkPad L490, 64 bit Windows system, 1.8 Ghz Intel Core i7-8565U, 32 GB RAM, with Julia 1.6.
 \begin{table}[H]\label{tab:Results}
     \center
-        \begin{tabular}{l l l l l }
+        \begin{tabular}{lcccccc}
             \toprule
-            Manifold & \multicolumn{2}{c}{$\mathbb{S}^{99}$} & \multicolumn{2}{c}{$\mathbb{S}^{299}$}   \\ 
-            \midrule
-            & Time & Iterations & Time & Iterations  \\ 
-            \midrule
-            RBFGS & $248.525 \, \mathrm{ms}$ & $79$ & $2.318 \, \mathrm{s}$ & $88$  \\ 
-            \midrule
-            Inverse RBFGS & $97.434 \, \mathrm{ms}$ & $79$ & $888.005 \, \mathrm{ms}$ & $88$   \\
-            \midrule
-            RSR1 & $450.167 \, \mathrm{ms}$ & $105$ & $5.630 \, \mathrm{s}$ & $295$  \\ 
-            \midrule
-            Inverse RSR1 & $336.362 \, \mathrm{ms}$ & $115$ & $3.737 \, \mathrm{s}$ & $309$   \\
+            Manifold & \multicolumn{2}{c}{$\mathbb{S}^{49}$}& \multicolumn{2}{c}{$\mathbb{S}^{99}$} & \multicolumn{2}{c}{$\mathbb{S}^{199}$}\\ 
+            \cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7}
+            Quadratic term & Newton & SR1 & Newton & SR1 & Newton & SR1 \\ 
+
+            $\varnothing$ Time in ms & $4.5$ & $17.0$ & $54.2$ & $80.2$ & $245.5$ & $269.4$\\ 
+            $\varnothing$ Iterations & $9.2$ & $41.5$ & $10.2$ & $70.1$ & $10.5$ & $83.1$ \\
+            $\varnothing$ k Allocations& $3.7$ & $23.0$ & $4.9$ & $35.3$ & $5.9$ & $52.5$ \\
             \bottomrule
         \end{tabular}
-
-    \caption{Comparison of the quasi-Newton methods.}
+    \caption{Comparison of the Riemannian Trust-Region methods.}
 \end{table}
-\cref{tab:Results} contains the results of the various quasi-Newton methods on $\mathbb{S}^{99}$ and $\mathbb{S}^{299}$. For the time measurement the package BenchmarkTools.jl was used. The time was measured with a benchmark of $10$ samples and $1$ evaluation per sample using a random point on the manifold. The iterations are the average of the measured iterations from $10$ random runs. \\
-We note that the RSR1 method was aborted twice on the manifold $\mathbb{S}^{99}$ and three times on the manifold $\mathbb{S}^{299}$, because the norm of the gradient of $f$ was not smaller than $10^{-6}$ until $1000$ iterations. These results were not taken into account in the calculation of the average iterations and are not considered valid. A total of $10$ runs were made in which the RSR1 method stopped due to the norm of the gradient. This occurrence is not surprising, since no convergence statements are known about the Riemannian SR1 quasi-Newton method and one cannot generally assume fast local convergence. \\
+\cref{tab:Results} contains the results of both Riemannin trust-region methods on $\mathbb{S}^{49}$, $\mathbb{S}^{99}$ and $\mathbb{S}^{199}$. For the measurement of the average time and the average number of thousand allocations, we used the package \lstinline!BenchmarkTools.jl!. The measurement was done with a benchmark of $30$ samples and $10$ evaluation per sample using a random point on the manifold. The iterations are the average of the measured iterations from $10$ random runs. \\
+
 In the results from \cref{tab:Results}, it is immediately apparent that the inverse RBFGS method is the clear winner. Both the RBFGS method and the inverse RBFGS method need less time and fewer iterations for both manifolds than the RSR1 and the inverse RSR1 method. This is not very surprising as the BFGS method is considered the most efficient quasi-Newton method in the Euclidean case. \\
+
+
+
+
 The lower number of iterations can be explained by the fact that by choosing a stepsize $\alpha_k > 0$ that satisfies the Wolfe conditions, the Riemannian curvature condition, , is satisfied and thus both RBFGS methods consistently produce positive definite operators. This in turn leads to the fact that $\eta_k$ is a descent direction in each iteration, which leads to a steady descent of the objective function $f$. This, of course, favours faster convergence. In the RSR1 and the inverse RSR1 method, this property is not given, which seems to be important, since on $\mathbb{S}^{299}$ the RSR1 and the inverse RSR1 method need three times more iterations than the RBFGS and inverse RBFGS method. \\
 The large time difference can be attributed to the higher number of iterations on the one hand and on the other hand it can be more difficult to find a suitable stepsize if $\eta_k$ is not a descent direction, which can be the case with the RSR1 and the inverse RSR1 method. \\
 Interestingly, both RBFGS methods have the same average number of iterations, but the inverse RBFGS method takes less than half the time. This is most likely due to the solving of the system $\mathcal{H}^{RBFGS}_k [\eta_k] = \operatorname{grad} f(x_k)$, which can be (very) costly and occurs in every iteration of the RBFGS method. The same phenomenon can be observed with the RSR1 and the inverse RSR1 method. The inverse RSR1 method even needs slightly more iterations, but less time.
