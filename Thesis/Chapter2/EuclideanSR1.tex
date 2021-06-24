@@ -67,7 +67,7 @@ holds, where $\nu \in (0, 1)$ is a small number, e.g. $r = 10^{−8}$. Most impl
 \begin{algorithm}[H]
     \caption{Trust-Region Symmetric Rank-One Method}\label{TR-SR1Method}
     \begin{algorithmic}[1]
-        \State Continuously differentiable real-valued function $f$ on $\mathbb{R}^n$, bounded below; initial iterate $x_0 \in \mathbb{R}^n$; initial $\spd$ matrix $H^{\mathrm{SR1}}_0 \in \mathbb{R}^{n \times n}$; initial trust-region radius $\Delta_0 > 0$; safeguard constant $\nu \in (0,1)$; rejection boundary $\rho^{\prime} \in (0, 0.1)$; trust-region reduction factor $\tau_1 \in (0,1)$; trust-region magnification factor $\tau_2 > 1$; convergence tolerance $\varepsilon > 0$. Set $k = 0$.
+        \State Continuously differentiable real-valued function $f$ on $\mathbb{R}^n$, bounded below; initial iterate $x_0 \in \mathbb{R}^n$; initial symmetric matrix $H^{\mathrm{SR1}}_0 \in \mathbb{R}^{n \times n}$; initial trust-region radius $\Delta_0 > 0$; safeguard constant $\nu \in (0,1)$; rejection boundary $\rho^{\prime} \in (0, 0.1)$; trust-region reduction factor $\tau_1 \in (0,1)$; trust-region magnification factor $\tau_2 > 1$; convergence tolerance $\varepsilon > 0$. Set $k = 0$.
         \While{$\lVert \nabla f(x_k) \rVert > \varepsilon$}
             \State Obtain $s_k$ (approximately) solving \cref{trsubproblem}.
             \State Set $\widetilde{x}_{k+1} = x_k + s_k$ and $y_k = \nabla f(\widetilde{x}_{k+1}) - \nabla f(x_k)$.
