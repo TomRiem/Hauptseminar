@@ -7,6 +7,9 @@ From now on we consider Riemannian optimization problems, which consider finding
     \min f(x), \quad x \in \mathcal{M}.
 \end{equation*}
 From now on we assume that $\mathcal{M}$ is a $n$-dimensional geodesically complete Riemannian manifold. We further assume that the manifold $\mathcal{M}$ is embedded in a real-valued space (e.g. $\mathcal{M} \subseteq \mathbb{R}^m$) and connected. Further we assume that $f \colon \; \mathcal{M} \to \mathbb{R}$ is a twice continuously differentiable function, i.e. $f \in C^2(\mathcal{M})$. \\
+% Tangent space, Gradient, Heesian (Notation)
+
+
 Along a curve $\gamma(\alpha) = \retract{x_k}(\alpha \eta_k)$ on the manifold $\mathcal{M}$, which is defined by a chosen retraction $\retractionSymbol \colon \; \tangent{} \to \mathcal{M}$ (see \cite[Definition~4.1.1]{AbsilMahonySepulchre:2008}). Therefore the choice of a computationally efficient retraction is an important decision in the design of high-performance numerical algorithms on manifolds \cite[p.~54]{AbsilMahonySepulchre:2008}.
 
 Here $\mathcal{H}_k [\cdot]$ tries to approximate the action of the Riemannian Hessian $\operatorname{Hess} f(x_k) [\cdot]$ (see \cite[Definition~5.5.1]{AbsilMahonySepulchre:2008}) and $\mathcal{B}_k [\cdot]$ approximates the action of ${\operatorname{Hess} f(x_k)}^{-1} [\cdot]$. At the end of each iteration, these operators are updated to new operators $\mathcal{H}_{k+1}, \mathcal{B}_{k+1} \colon \; \tangent{x_{k+1}} \to \tangent{x_{k+1}}$ on the upcoming tangent space $\tangent{x_{k+1}}$. It is required that these satisfy some form of the Riemannian quasi-Newton equation. 
