@@ -1,6 +1,16 @@
 \section{Riemannian Trust-Region Symmetric Rank-One Method}
 
-%  models, trust-region subproblem, general trust-region method, Vector transport, flat, quasi-Newton operator, SR1 Update (unique), safeguard, algorithm, convergence
+%  models, trust-region subproblem, general Trust-Region method, Vector transport, flat, quasi-Newton operator, SR1 Update (unique), safeguard, algorithm, convergence
+
+We will first look at Trust-Region methods on Riemannian manifolds in general. To do this, we must first construct a quadratic model for our objective function, which is defined on the Riemannian manifold M. 
+
+% Model ?
+
+We can now lay out the structure of a Trust-Region method on a Riemannian manifold $(M,g)$ with retraction $\retractionSymbol$. Given a cost function $f \colon \mathcal{M} \to \mathbb{R}$ and a current iterate $x_k \in \mathcal{M}$, we use $\retract{x_k}$ to locally map the minimization problem for $f$ on $\mathcal{M}$ into a minimization problem for the pullback $\hat{f}_{x_k}$ of $f$ under $\retract{x_k}$,
+\begin{align*}
+    \hat{f}_{x_k} \colon \tangent{x_k} \to \mathbb{R} \\
+    \xi_{x_k} \mapsto \hat{f}_{x_k} (\xi_{x_k}) = f(\retract{x_k}(\xi_{x_k}))
+\end{align*}
 
 
 Here $\mathcal{H}_k [\cdot]$ tries to approximate the action of the Riemannian Hessian $\operatorname{Hess} f(x_k) [\cdot]$ (see \cite[Definition~5.5.1]{AbsilMahonySepulchre:2008}) and $\mathcal{B}_k [\cdot]$ approximates the action of ${\operatorname{Hess} f(x_k)}^{-1} [\cdot]$. At the end of each iteration, these operators are updated to new operators $\mathcal{H}_{k+1}, \mathcal{B}_{k+1} \colon \; \tangent{x_{k+1}} \to \tangent{x_{k+1}}$ on the upcoming tangent space $\tangent{x_{k+1}}$. It is required that these satisfy some form of the Riemannian quasi-Newton equation. 
