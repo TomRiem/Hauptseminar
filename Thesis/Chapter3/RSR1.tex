@@ -1,6 +1,20 @@
 \section{Riemannian Trust-Region Symmetric Rank-One Method}
 
-% Vector transport, flat, quasi-Newton operator, SR1 Update (unique), safeguard, algorithm, convergence
+%  models, trust-region subproblem, general trust-region method, Vector transport, flat, quasi-Newton operator, SR1 Update (unique), safeguard, algorithm, convergence
+
+
+Here $\mathcal{H}_k [\cdot]$ tries to approximate the action of the Riemannian Hessian $\operatorname{Hess} f(x_k) [\cdot]$ (see \cite[Definition~5.5.1]{AbsilMahonySepulchre:2008}) and $\mathcal{B}_k [\cdot]$ approximates the action of ${\operatorname{Hess} f(x_k)}^{-1} [\cdot]$. At the end of each iteration, these operators are updated to new operators $\mathcal{H}_{k+1}, \mathcal{B}_{k+1} \colon \; \tangent{x_{k+1}} \to \tangent{x_{k+1}}$ on the upcoming tangent space $\tangent{x_{k+1}}$. It is required that these satisfy some form of the Riemannian quasi-Newton equation. 
+
+By introducing the tangent vector $s_k = \parallelTransportDir{x_k}{\alpha_k \eta_k}(\alpha_k \eta_k) \in \tangent{x_{k+1}}$, which represents the connection between the two iterates $x_k$ and $x_{k+1}$, and the tangent vector $y_k = \operatorname{grad} f(x_{k+1}) - \parallelTransportDir{x_k}{\alpha_k \eta_k}(\operatorname{grad} f(x_k)) \in \tangent{x_{k+1}}$, which represents the difference of the gradients in $\tangent{x_{k+1}}$, the Riemannian quasi-Newton equation is given by 
+\begin{equation*}
+    \mathcal{H}_{k+1} [s_k] = y_k 
+\end{equation*}
+
+To be able to create rank-one operators, we introduce the musical isomorphism $\flat \colon \; \tangent{x_{k+1}} \ni \eta_{x_{k+1}} \mapsto \eta^{\flat}_{x_{k+1}} \in \cotangent{x_{k+1}}$ (see \cite[p.~6]{BergmannHerzogLouzeiroSilvaTenbrinckVidalNunez:2020:1}). Put simply, it means: $\eta^{\flat}_{x_{k+1}} \in \cotangent{x_{k+1}}$ represents the flat of $\eta_{x_{k+1}} \in \tangent{x_{k+1}}$, i.e., $\eta^{\flat}_{x_{k+1}} \colon \; \tangent{x_{k+1}} \to \mathbb{R}, \;  \xi_{x_{k+1}} \mapsto \eta^{\flat}_{x_{k+1}}[\xi_{x_{k+1}}] = g_{x_{k+1}} (\eta_{x_{k+1}}, \xi_{x_{k+1}})$. This generalizes the notion of the transpose. As noted earlier, there are several quasi-Newton update formulae for operators that have been generalized from the Euclidean case to the Riemannian setup. 
+
+\begin{equation}\label{Riemanniantrsubproblem}
+    s_k = \arg \min_{\lVert s \rVert_{x_k} \leq \Delta_k} m_k( s ) = \arg \min_{\lVert s \rVert_{x_k} \leq \Delta_k} f(x_k) + g_{x_k}(\operatorname{grad} f(x_k), s ) + \frac{1}{2} g_{x_k}( s , \mathcal{H}_k [ s ] ).
+\end{equation}
 
 
 A general symmetric rank-one update has the form

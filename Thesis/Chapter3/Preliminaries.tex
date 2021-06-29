@@ -1,27 +1,45 @@
-\section{Riemannian Trust-Region Methods}
+\section{Preliminaries}
 
-% tangent spaces, Gradient, Hessian, retraction, pullback, models, trust-region subproblem, general trust-region method, global convergence
+Before we enter the theory about the Trust-Region Symmetric Rank-One method on Riemannian manifolds, we introduce certain basic principles and aspects in this section, which will be needed later. \\
 
 From now on we consider Riemannian optimization problems, which consider finding an optimum of a real-valued function $f$ defined on a Riemannian manifold $\mathcal{M}$, i.e.
 \begin{equation*}
     \min f(x), \quad x \in \mathcal{M}.
 \end{equation*}
 From now on we assume that $\mathcal{M}$ is a $n$-dimensional geodesically complete Riemannian manifold. We further assume that the manifold $\mathcal{M}$ is embedded in a real-valued space (e.g. $\mathcal{M} \subseteq \mathbb{R}^m$) and connected. Further we assume that $f \colon \; \mathcal{M} \to \mathbb{R}$ is a twice continuously differentiable function, i.e. $f \in C^2(\mathcal{M})$. \\
-% Tangent space, Gradient, Heesian (Notation)
-
-
-Along a curve $\gamma(\alpha) = \retract{x_k}(\alpha \eta_k)$ on the manifold $\mathcal{M}$, which is defined by a chosen retraction $\retractionSymbol \colon \; \tangent{} \to \mathcal{M}$ (see \cite[Definition~4.1.1]{AbsilMahonySepulchre:2008}). Therefore the choice of a computationally efficient retraction is an important decision in the design of high-performance numerical algorithms on manifolds \cite[p.~54]{AbsilMahonySepulchre:2008}.
-
-Here $\mathcal{H}_k [\cdot]$ tries to approximate the action of the Riemannian Hessian $\operatorname{Hess} f(x_k) [\cdot]$ (see \cite[Definition~5.5.1]{AbsilMahonySepulchre:2008}) and $\mathcal{B}_k [\cdot]$ approximates the action of ${\operatorname{Hess} f(x_k)}^{-1} [\cdot]$. At the end of each iteration, these operators are updated to new operators $\mathcal{H}_{k+1}, \mathcal{B}_{k+1} \colon \; \tangent{x_{k+1}} \to \tangent{x_{k+1}}$ on the upcoming tangent space $\tangent{x_{k+1}}$. It is required that these satisfy some form of the Riemannian quasi-Newton equation. 
-
-By introducing the tangent vector $s_k = \parallelTransportDir{x_k}{\alpha_k \eta_k}(\alpha_k \eta_k) \in \tangent{x_{k+1}}$, which represents the connection between the two iterates $x_k$ and $x_{k+1}$, and the tangent vector $y_k = \operatorname{grad} f(x_{k+1}) - \parallelTransportDir{x_k}{\alpha_k \eta_k}(\operatorname{grad} f(x_k)) \in \tangent{x_{k+1}}$, which represents the difference of the gradients in $\tangent{x_{k+1}}$, the Riemannian quasi-Newton equation is given by 
+In order to generalize Trust-Region methods, we must also consider directions on a manifold. For that we introduce tangent vectors. A tangent vector $\xi_x$ to a manifold $\mathcal{M}$ at a point $x \in \mathcal{M}$ is a map from $C^{\infty}_x(\mathcal{M})$ (the set of smooth real-valued functions defined on a neighborhood of $x$) to $\mathbb{R}$ such that there exists a curve $\geodesicSymbol$ on $\mathcal{M}$ with $\geodesic<s>(0) = x$, satisfying
 \begin{equation*}
-    \mathcal{H}_{k+1} [s_k] = y_k 
+    \xi_x (f) = \dot{\geodesicSymbol}(0) \; f = \frac{\mathrm{d}}{\mathrm{d}t} f(\geodesic<s>(t)) \; \big{\vert}_{t=0}
 \end{equation*}
+for all $f \in C^{\infty}_x(\mathcal{M})$. The set of all tangent vectors at $x \in \mathcal{M}$ forms the tangent space $\tangent{x}$, which is a vector space of dimension $n$. The disjoint union of all tangent spaces, i.e. $\tangent{} = \coprod_{x \in \mathcal{M}} \tangent{x}$, is called the tangent bundle of $\mathcal{M}$. It is a smooth manifold of dimension $2n$ \cite[p.~33-36]{AbsilMahonySepulchre:2008}. \\
+On a Riemannian manifold $\mathcal{M}$ we have the so-called Riemannian metric, which is a smoothly varying family of inner products on the tangent spaces $\tangent{x}$. The metric on the tangent space at $x \in \mathcal{M}$ is denoted by $g_x(\cdot, \cdot) \colon \tangent{x} \times \tangent{x} \to \mathbb{R}$. The Riemannian metric also induces a norm $\lVert \xi_x \rVert_x = \sqrt{g_x(\xi_x, \xi_x)}$ on the tangent spaces $\tangent{x}$ \cite[p.~45]{AbsilMahonySepulchre:2008}. \\
+In the Euclidean case, the gradient provides us with useful information which is used in the construction of the model. Since the gradient is a direction on a manifold, it should be a tangent vector. For a real-valued function $f$, the Riemannian gradient $\operatorname{grad} f(x)$ of $f$ at $x$ is the unique tangent vector such that
+\begin{equation*}
+    \mathrm{D} \, f(x) [\xi_x] = g_x (\operatorname{grad} f(x), \xi_x), \quad \text{for all } \xi_x \tangent{x}
+\end{equation*}
+where $\mathrm{D} \, f(x)$ denotes the differential of $f$ at $x$ \cite[p.~46]{AbsilMahonySepulchre:2008}. \\
+The Hessian is required in second-order optimization algorithms, such as the Trust-Region Newton method. The Riemannian Hessian represents the covariant derivative of the gradient in the direction of the chosen tangent vector, the Riemannian Hessian of $f$ at $x$ is a linear self-adjoint operator on $\tangent{x}$ defined by
+\begin{equation*}
+    \operatorname{Hess} f(x) [\xi_{x}] = \nabla_{\xi_{x}} \operatorname{grad} f(x) \quad \text{for all } \xi_x \tangent{x},
+\end{equation*}
+where $\nabla$ is the so-called Levi-Civita connection, which is a unique affine connection on a Riemannian Manifold (see \cite[Theorem~5.3.1~(Levi-Civita)]{AbsilMahonySepulchre:2008}) \cite[p.~105]{AbsilMahonySepulchre:2008}. \\ 
+On a manifold, the notion of moving in the direction of a tangent vector, while staying on the manifold, is generalized by the notion of a so-called retraction:
 
-To be able to create rank-one operators, we introduce the musical isomorphism $\flat \colon \; \tangent{x_{k+1}} \ni \eta_{x_{k+1}} \mapsto \eta^{\flat}_{x_{k+1}} \in \cotangent{x_{k+1}}$ (see \cite[p.~6]{BergmannHerzogLouzeiroSilvaTenbrinckVidalNunez:2020:1}). Put simply, it means: $\eta^{\flat}_{x_{k+1}} \in \cotangent{x_{k+1}}$ represents the flat of $\eta_{x_{k+1}} \in \tangent{x_{k+1}}$, i.e., $\eta^{\flat}_{x_{k+1}} \colon \; \tangent{x_{k+1}} \to \mathbb{R}, \;  \xi_{x_{k+1}} \mapsto \eta^{\flat}_{x_{k+1}}[\xi_{x_{k+1}}] = g_{x_{k+1}} (\eta_{x_{k+1}}, \xi_{x_{k+1}})$. This generalizes the notion of the transpose. As noted earlier, there are several quasi-Newton update formulae for operators that have been generalized from the Euclidean case to the Riemannian setup. 
+\begin{definition}[{\cite[Definition~4.1.1]{AbsilMahonySepulchre:2008}}]\label{Retraction}
+    A retraction on a manifold $\mathcal{M}$ is a smooth map $\retractionSymbol \colon \; \tangent{} \to \mathcal{M}$ with the following properties. Let $\retract{x}(\cdot)$ denote the restriction of $\retractionSymbol$ to $\tangent{x}$. 
+    \begin{enumerate}
+        \item $\retract{x}(0_x) = x$, where $0_x$ denotes the zero element of $\tangent{x}$. 
+        \item With the canonical identification $\tangent{0_x}[\tangent{x}] \simeq \tangent{x}$, $\retract{x}$ satisfies \begin{equation} \mathrm{D} \; \retract{x}(0_x) = \id_{\tangent{x}}, \label{LocalRigidity} \end{equation} where $\id_{\tangent{x}}$ denotes the identity map on $\tangent{x}$.  
+    \end{enumerate}
+\end{definition}
 
-\begin{equation}\label{Riemanniantrsubproblem}
-    s_k = \arg \min_{\lVert s \rVert_{x_k} \leq \Delta_k} m_k( s ) = \arg \min_{\lVert s \rVert_{x_k} \leq \Delta_k} f(x_k) + g_{x_k}(\operatorname{grad} f(x_k), s ) + \frac{1}{2} g_{x_k}( s , \mathcal{H}_k [ s ] ).
+We assume that the domain of $\retractionSymbol$ is the whole tangent bundle $\tangent{}$. The condition \cref{LocalRigidity} is called local rigidity condition. Equivalently, for every tangent vector $\xi_x$ in $\tangent{x}$, the curve $\geodesicSymbol \colon \; t \to \retract{x}(t \; \xi_x)$ satisfies $\dot{\geodesicSymbol}(0) = \xi_x$. Moving along this curve $\geodesicSymbol$ is thought of as moving in the direction $\xi_x$ while constrained to the manifold $\mathcal{M}$. Therefore the choice of a computationally efficient retraction is an important decision in the design of high-performance numerical algorithms on manifolds. \\
+Besides turning tangent vectors into points of the manifold, a second important purpose of a retraction is to transform cost functions defined in a neighborhood of $x \in \mathcal{M}$ into cost functions defined on the vector space $\tangent{x}$. Specifically, given a real-valued function $f$ on a manifold $\mathcal{M}$ equipped with a retraction $\retractionSymbol$, we let $\hat{f} = f \circ \retractionSymbol$ denote the pullback of $f$ through R. For $x \in \mathcal{M}$, we let
+\begin{equation}\label{pullback}
+    \hat{f}_x = f \circ \retract{x}
 \end{equation}
-
+denote the restriction of $\hat{f}$ to $\tangent{x}$, which is now a real-valued function on a vector space. We note that since the local rigidity condition \cref{LocalRigidity} holds, we have $\mathrm{D} \, \hat{f}_x (0_x) = \mathrm{D} \, f(x)$, and since we assume that $\mathcal{M}$ is a Riemannian manifold (and thus $\tangent{x}$ with an inner product), we have 
+\begin{equation*}
+    \operatorname{grad} \hat{f}_x (0_x) = \operatorname{grad} f(x).
+\end{equation*}
+\cite[p.~54-56]{AbsilMahonySepulchre:2008}
