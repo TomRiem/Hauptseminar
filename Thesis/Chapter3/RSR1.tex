@@ -2,15 +2,65 @@
 
 %  models, trust-region subproblem, general Trust-Region method, Vector transport, flat, quasi-Newton operator, SR1 Update (unique), safeguard, algorithm, convergence
 
-We will first look at Trust-Region methods on Riemannian manifolds in general. To do this, we must first construct a quadratic model for our objective function, which is defined on the Riemannian manifold M. 
-
-% Model ?
-
-We can now lay out the structure of a Trust-Region method on a Riemannian manifold $(M,g)$ with retraction $\retractionSymbol$. Given a cost function $f \colon \mathcal{M} \to \mathbb{R}$ and a current iterate $x_k \in \mathcal{M}$, we use $\retract{x_k}$ to locally map the minimization problem for $f$ on $\mathcal{M}$ into a minimization problem for the pullback $\hat{f}_{x_k}$ of $f$ under $\retract{x_k}$,
+We will first look at Trust-Region methods on Riemannian manifolds in general. To do this, we must construct a quadratic model for our objective function, which is defined on the Riemannian manifold M. But this is not, in general, a Euclidean space, which makes the situation quite difficult. To avoid this problem, we choose a retraction on the Riemannian manifold, which provides a way to pull back the cost function on the manifold to a cost function on the tangent space. \\
+Given a cost function $f \colon \mathcal{M} \to \mathbb{R}$ and a current iterate $x_k \in \mathcal{M}$, we use $\retract{x_k}$ to locally map the minimization problem for $f$ on $\mathcal{M}$ into a minimization problem for the pullback $\hat{f}_{x_k}$ of $f$ under $\retract{x_k}$ on the tangent space $\tangent{x_k}$,
 \begin{align*}
-    \hat{f}_{x_k} \colon \tangent{x_k} \to \mathbb{R} \\
-    \xi_{x_k} \mapsto \hat{f}_{x_k} (\xi_{x_k}) = f(\retract{x_k}(\xi_{x_k}))
+    \hat{f}_{x_k} \colon \tangent{x_k} & \to \mathbb{R} \\
+    \xi_{x_k} & \mapsto \hat{f}_{x_k} (\xi_{x_k}) = f(\retract{x_k}(\xi_{x_k})).
 \end{align*}
+The Riemannian metric turns the tangent space $\tangent{x_k}$ into a Euclidean space endowed with the inner product $g_{x_k}(\cdot, \cdot)$, which enables us to construct a order-2 model of the pullback $\hat{f}_{x_k}$:
+\begin{align*}
+    \hat{m}_k( s ) & = \hat{f}_{x_k}(0_{x_k}) + \mathrm{D} \, \hat{f}_{x_k}(0_{x_k}) [s] + \frac{1}{2} \mathrm{D} \, \hat{f}_{x_k}(0_{x_k}) [s, s] \\
+    & = f(x_k) + g_{x_k}(\operatorname{grad} f(x_k), s ) + \frac{1}{2} g_{x_k}( s, \operatorname{Hess} \hat{f}_{x_k}(0_{x_k}) [s]).
+\end{align*}
+By \cref{Retraction} we get $\hat{f}_{x_k}(0_{x_k}) = f(\retract{x_k}(0_{x_k})) = f(x_k)$ and since the local rigidity condition \cref{LocalRigidity} holds, we have $\mathrm{D} \, \hat{f}_{x_k}(0_{x_k}) = \mathrm{D} \, f(x_k)$, hence $\operatorname{grad} \hat{f}_{x_k}(0_{x_k}) = \operatorname{grad} f(x_k)$. \\
+Finally, we “push forward” the model $\hat{m}_k(s)$ through the retraction $\retract{x_k}$, i.e.
+\begin{equation}\label{RiemannianModel}
+    m_k(s) = \hat{m}_k(s) \circ \inverseRetract{x_k}
+\end{equation}
+with
+\begin{equation}\label{RiemannianModelTangent}
+    \hat{m}_k( s ) = f(x_k) + g_{x_k}(\operatorname{grad} f(x_k), s ) + \frac{1}{2} g_{x_k}( s, \operatorname{Hess} f(x_k) [s]),
+\end{equation}
+where the quadratic term is given by the Riemannian Hessian of the objective function $f$. \\
+In general, the model \cref{RiemannianModel} using \cref{RiemannianModel} is only order 1 because $\operatorname{Hess} \hat{f}_{x_k}(0_{x_k}) \neq \operatorname{Hess} f(x_k)$. Since the Hessian operator of the pullback depends among other things on the chosen retraction, further conditions must be imposed on the retraction so that this equality holds. However, for any retraction, $\operatorname{Hess} \hat{f}_{x^*}(0_{x^*}) \neq \operatorname{Hess} f(x^*)$ holds, when $x^*$ is a stationary point of $f$, i.e. $\operatorname{grad} f(x^*) = 0_{x^*}$ \cite[p.~138-139]{AbsilMahonySepulchre:2008}. \\
+However, this is of no importance for now, since we only consider quadratic models of the pullback $\hat{f}_{x_k}$ in general, which means 
+\begin{equation}\label{RiemannianQuadraticModel}
+    \hat{m}_k( s ) = f(x_k) + g_{x_k}(\operatorname{grad} f(x_k), s ) + \frac{1}{2} g_{x_k}( s, \mathcal{H}_k [s]),
+\end{equation}
+where $\mathcal{H}_k$ is some linear self-adjoint operator on $\tangent{x_k}$. This model \cref{RiemannianQuadraticModel} is easier to handle than the pullback $\hat{f}_{x_k}$ and its purpose is to approximate $\hat{f}_{x_k}$ within a suitable neighbourhood of the zero tangent vector $0_{x_k} \in \tangent{x_k}$ which we refer to as the trust-region. By using the norm induced by the Riemannian metric, we can define the trust-region as the set of all points
+\begin{equation}\label{RiemannianTrustRegion}
+    \{ s \in \tangent{x_k} \colon \ \lVert s \rVert_{x_k} \leq \Delta_k \}
+\end{equation}
+where $\Delta_k > 0$ is the trust-region radius. We point out that our trust-region now consists not of all points on the manifold which have the distance less or equal $\Delta_k$ to the current iterate $x_k$, but of all tangent vectors in tangent space of the current iterate $\tangent{x_k}$ whose length is less or equal $\Delta_k$. The chosen retraction $\retractionSymbol$ defines for any iterate $x_k \in \mathcal{M}$, a one-to-one correspondence $\retract{x_k}$ between a neighborhood of $x_k$ in $\mathcal{M}$ and a neighborhood of $0_{x_k}$ in the tangent space $\tangent{x_k}$ (we remember $\retract{x_k}(0_{x_k}) = x_k$) \cite[p.~304]{AbsilBakerGallivan:2007}. But the chosen retraction $\retractionSymbol$ applied to a tangent vector $\xi_{x_k} \in \tangent{x_k}$ generally does not lead to a point $\retract{x_k}(\xi_{x_k})$ whose distance to the starting point $x_k$ is equal to the norm of the tangent vector $\xi_{x_k}$, i.e. $\operatorname{dist}(x_k, \retract{x_k}(\xi_{x_k})) \neq \lVert \xi_{x_k} \rVert_{x_k}$. \\
+Next, we compute the step $s_k \in \tangent{x_k}$ as an (approximate) solution of the trust-region subproblem given by the model \cref{RiemannianQuadraticModel} and the trust-region \cref{RiemannianTrustRegion}, i.e.
+\begin{equation}\label{Riemanniantrsubproblem}
+    s_k = \arg \min_{\lVert s \rVert_{x_k} \leq \Delta_k} \hat{m}_k( s ) \in \tangent{x_k}.
+\end{equation}
+Since $\tangent{x_k}$ is a Euclidean space, it is possible to adapt classical methods in $R^n$ to compute a approximate minimizer of the trust-region subproblem \cref{Riemanniantrsubproblem} \cite[p.~304]{AbsilBakerGallivan:2007}. A possible method for this is given by \cite[Algorithm~11]{AbsilMahonySepulchre:2008} which is based on a generalization of the truncated conjugate-gradient method into the Riemannian setup. \\
+This minimizer $s_k$ is then retracted back from $\tangent{x_k}$ to $\mathcal{M}$, i.e.
+\begin{equation*}
+    \widetilde{x}_{k+1} = \retract{x_k}(s_k).
+\end{equation*}
+This point is a candidate for the new iterate $x_{k+1}$. The decisions on accepting or rejecting the candidate $\widetilde{x}_{k+1}$ and on selecting the new trust-region radius $\Delta_k$ are based on the quotient
+\begin{equation*}
+    \rho_k = \frac{f(x_k) - f(x_k + s_k)}{m_k(0) - m_k(s_k)} = \frac{f(x_k) - f(\widetilde{x}_{k+1})}{m_k(0) - m_k(s_k)},
+\end{equation*}
+
+
+
+It is this “lift-solve-retract” procedure that distinguishes the proposed RTR
+approach from the standard trust-region methods; the standard methods, since they
+live in Rn, only require the “solve” part. On a manifold, lifting the cost function
+makes it possible to locally fall back to a friendly Euclidean world (the tangent
+space Tx M) where classical techniques can be applied, and the retraction brings
+the result back to the manifold. A difficulty, from an analysis perspective, is that
+the RTR method does not deal with a unique cost function (as in the classical case),
+but rather with a succession of different lifted cost functions fxk , where xk is the
+kth iterate. A main contribution of this paper is to show that, under reasonable
+conditions, the nice properties of the standard trust-region schemes are preserved
+in their Riemannian generalizations (see Section 4).
+
 
 
 Here $\mathcal{H}_k [\cdot]$ tries to approximate the action of the Riemannian Hessian $\operatorname{Hess} f(x_k) [\cdot]$ (see \cite[Definition~5.5.1]{AbsilMahonySepulchre:2008}) and $\mathcal{B}_k [\cdot]$ approximates the action of ${\operatorname{Hess} f(x_k)}^{-1} [\cdot]$. At the end of each iteration, these operators are updated to new operators $\mathcal{H}_{k+1}, \mathcal{B}_{k+1} \colon \; \tangent{x_{k+1}} \to \tangent{x_{k+1}}$ on the upcoming tangent space $\tangent{x_{k+1}}$. It is required that these satisfy some form of the Riemannian quasi-Newton equation. 
