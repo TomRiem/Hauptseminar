@@ -2,8 +2,8 @@
 
 %  models, trust-region subproblem, general Trust-Region method, Vector transport, flat, quasi-Newton operator, SR1 Update (unique), safeguard, algorithm, convergence
 
-We will first look at Trust-Region methods on Riemannian manifolds in general. To do this, we must construct a quadratic model for our objective function, which is defined on the Riemannian manifold M. But this is not, in general, a Euclidean space, which makes the situation quite difficult. To avoid this problem, we choose a retraction on the Riemannian manifold, which provides a way to pull back the cost function on the manifold to a cost function on the tangent space. \\
-Given a cost function $f \colon \mathcal{M} \to \mathbb{R}$ and a current iterate $x_k \in \mathcal{M}$, we use $\retract{x_k}$ to locally map the minimization problem for $f$ on $\mathcal{M}$ into a minimization problem for the pullback $\hat{f}_{x_k}$ of $f$ under $\retract{x_k}$ on the tangent space $\tangent{x_k}$,
+We will first look at Trust-Region methods on Riemannian manifolds in general. To do this, we must construct a quadratic model for our objective function, which is defined on a Riemannian manifold $\mathcal{M}$. But this is not, in general, a Euclidean space, which makes the situation quite difficult. To avoid this problem, we choose a retraction $\retractionSymbol$, which provides a way to pull back the objective function on the manifold to a objective function on the tangent space. \\
+Given a objective function $f \colon \mathcal{M} \to \mathbb{R}$ and a current iterate $x_k \in \mathcal{M}$, we use $\retract{x_k}$ to locally map the minimization problem for $f$ on $\mathcal{M}$ into a minimization problem for the pullback $\hat{f}_{x_k}$ of $f$ under $\retract{x_k}$ on the tangent space $\tangent{x_k}$,
 \begin{align*}
     \hat{f}_{x_k} \colon \tangent{x_k} & \to \mathbb{R} \\
     \xi_{x_k} & \mapsto \hat{f}_{x_k} (\xi_{x_k}) = f(\retract{x_k}(\xi_{x_k})).
@@ -32,7 +32,7 @@ where $\mathcal{H}_k$ is some linear self-adjoint operator on $\tangent{x_k}$. T
 \begin{equation}\label{RiemannianTrustRegion}
     \{ s \in \tangent{x_k} \colon \ \lVert s \rVert_{x_k} \leq \Delta_k \}
 \end{equation}
-where $\Delta_k > 0$ is the trust-region radius. We point out that our trust-region now consists not of all points on the manifold which have the distance less or equal $\Delta_k$ to the current iterate $x_k$, but of all tangent vectors in tangent space of the current iterate $\tangent{x_k}$ whose length is less or equal $\Delta_k$. The chosen retraction $\retractionSymbol$ defines for any iterate $x_k \in \mathcal{M}$, a one-to-one correspondence $\retract{x_k}$ between a neighborhood of $x_k$ in $\mathcal{M}$ and a neighborhood of $0_{x_k}$ in the tangent space $\tangent{x_k}$ (we remember $\retract{x_k}(0_{x_k}) = x_k$) \cite[p.~304]{AbsilBakerGallivan:2007}. But the chosen retraction $\retractionSymbol$ applied to a tangent vector $\xi_{x_k} \in \tangent{x_k}$ generally does not lead to a point $\retract{x_k}(\xi_{x_k})$ whose distance to the starting point $x_k$ is equal to the norm of the tangent vector $\xi_{x_k}$, i.e. $\operatorname{dist}(x_k, \retract{x_k}(\xi_{x_k})) \neq \lVert \xi_{x_k} \rVert_{x_k}$. \\
+where $\Delta_k > 0$ is the trust-region radius. We point out that our trust-region now consists not of all points on the manifold which have the distance less or equal $\Delta_k$ to the current iterate $x_k$, but of all tangent vectors in tangent space at the current iterate $\tangent{x_k}$ whose length is less or equal $\Delta_k$. The chosen retraction $\retractionSymbol$ defines for any iterate $x_k \in \mathcal{M}$, a one-to-one correspondence $\retract{x_k}$ between a neighborhood of $x_k$ in $\mathcal{M}$ and a neighborhood of $0_{x_k}$ in the tangent space $\tangent{x_k}$ (we remember $\retract{x_k}(0_{x_k}) = x_k$) \cite[p.~304]{AbsilBakerGallivan:2007}. But the chosen retraction $\retractionSymbol$ applied to a tangent vector $\xi_{x_k} \in \tangent{x_k}$ generally does not lead to a point $\retract{x_k}(\xi_{x_k})$ whose distance to the starting point $x_k$ is equal to the norm of the tangent vector $\xi_{x_k}$, i.e. $\operatorname{dist}(x_k, \retract{x_k}(\xi_{x_k})) \neq \lVert \xi_{x_k} \rVert_{x_k}$. \\
 Next, we compute the step $s_k \in \tangent{x_k}$ as an (approximate) solution of the trust-region subproblem given by the model \cref{RiemannianQuadraticModel} and the trust-region \cref{RiemannianTrustRegion}, i.e.
 \begin{equation}\label{Riemanniantrsubproblem}
     s_k = \arg \min_{\lVert s \rVert_{x_k} \leq \Delta_k} \hat{m}_k( s ) \in \tangent{x_k}.
@@ -44,66 +44,67 @@ This minimizer $s_k$ is then retracted back from $\tangent{x_k}$ to $\mathcal{M}
 \end{equation*}
 This point is a candidate for the new iterate $x_{k+1}$. The decisions on accepting or rejecting the candidate $\widetilde{x}_{k+1}$ and on selecting the new trust-region radius $\Delta_k$ are based on the quotient
 \begin{equation*}
-    \rho_k = \frac{f(x_k) - f(x_k + s_k)}{m_k(0) - m_k(s_k)} = \frac{f(x_k) - f(\widetilde{x}_{k+1})}{m_k(0) - m_k(s_k)},
+    \rho_k = \frac{\hat{f}_{x_k}(0_{x_k}) - \hat{f}_{x_k}(s_k)}{\hat{m}_k(0_{x_k}) - \hat{m}_k(s_k)} = \frac{f(x_k) - f(\retract{x_k}(s_k))}{\hat{m}_k(0_{x_k}) - \hat{m}_k(s_k)} = \frac{f(x_k) - f(\widetilde{x}_{k+1})}{\hat{m}_k(0_{x_k}) - \hat{m}_k(s_k)}.
 \end{equation*}
+The decisions as well as the resulting updates concerning the candidate and the trust-region radius follow the same heuristics as in Euclidean. \\ % Schönerer satz bitte
+We point out that this “pullback-solve-retract” distinguishes the Riemannian Trust-Region approach from the Euclidean Trust-Region methods, which only require the “solve” part since they live in $\mathbb{R}^n$. On a manifold, using the pullback $\hat{f}_{x_k}$ of the objective function $f$ makes it possible to locally fall back to a friendly Euclidean world (the tangent space $\tangent{x_k}$) where classical techniques can be applied, and the retraction $\retract{x_k}$ brings the result back to the manifold $\mathcal{M}$. A difficulty, from an analysis perspective, is that the Riemannian Trust-Region approach does not deal with a unique objective function $f$,
+but rather with a succession of different pullbacks $\hat{f}_{x_k}$ of the objetcive function \cite[p.~305]{AbsilBakerGallivan:2007}. \\
 
-
-
-It is this “lift-solve-retract” procedure that distinguishes the proposed RTR
-approach from the standard trust-region methods; the standard methods, since they
-live in Rn, only require the “solve” part. On a manifold, lifting the cost function
-makes it possible to locally fall back to a friendly Euclidean world (the tangent
-space Tx M) where classical techniques can be applied, and the retraction brings
-the result back to the manifold. A difficulty, from an analysis perspective, is that
-the RTR method does not deal with a unique cost function (as in the classical case),
-but rather with a succession of different lifted cost functions fxk , where xk is the
-kth iterate. A main contribution of this paper is to show that, under reasonable
-conditions, the nice properties of the standard trust-region schemes are preserved
-in their Riemannian generalizations (see Section 4).
-
-
-
-Here $\mathcal{H}_k [\cdot]$ tries to approximate the action of the Riemannian Hessian $\operatorname{Hess} f(x_k) [\cdot]$ (see \cite[Definition~5.5.1]{AbsilMahonySepulchre:2008}) and $\mathcal{B}_k [\cdot]$ approximates the action of ${\operatorname{Hess} f(x_k)}^{-1} [\cdot]$. At the end of each iteration, these operators are updated to new operators $\mathcal{H}_{k+1}, \mathcal{B}_{k+1} \colon \; \tangent{x_{k+1}} \to \tangent{x_{k+1}}$ on the upcoming tangent space $\tangent{x_{k+1}}$. It is required that these satisfy some form of the Riemannian quasi-Newton equation. 
-
-By introducing the tangent vector $s_k = \parallelTransportDir{x_k}{\alpha_k \eta_k}(\alpha_k \eta_k) \in \tangent{x_{k+1}}$, which represents the connection between the two iterates $x_k$ and $x_{k+1}$, and the tangent vector $y_k = \operatorname{grad} f(x_{k+1}) - \parallelTransportDir{x_k}{\alpha_k \eta_k}(\operatorname{grad} f(x_k)) \in \tangent{x_{k+1}}$, which represents the difference of the gradients in $\tangent{x_{k+1}}$, the Riemannian quasi-Newton equation is given by 
-\begin{equation*}
-    \mathcal{H}_{k+1} [s_k] = y_k 
-\end{equation*}
-
-To be able to create rank-one operators, we introduce the musical isomorphism $\flat \colon \; \tangent{x_{k+1}} \ni \eta_{x_{k+1}} \mapsto \eta^{\flat}_{x_{k+1}} \in \cotangent{x_{k+1}}$ (see \cite[p.~6]{BergmannHerzogLouzeiroSilvaTenbrinckVidalNunez:2020:1}). Put simply, it means: $\eta^{\flat}_{x_{k+1}} \in \cotangent{x_{k+1}}$ represents the flat of $\eta_{x_{k+1}} \in \tangent{x_{k+1}}$, i.e., $\eta^{\flat}_{x_{k+1}} \colon \; \tangent{x_{k+1}} \to \mathbb{R}, \;  \xi_{x_{k+1}} \mapsto \eta^{\flat}_{x_{k+1}}[\xi_{x_{k+1}}] = g_{x_{k+1}} (\eta_{x_{k+1}}, \xi_{x_{k+1}})$. This generalizes the notion of the transpose. As noted earlier, there are several quasi-Newton update formulae for operators that have been generalized from the Euclidean case to the Riemannian setup. 
-
-\begin{equation}\label{Riemanniantrsubproblem}
-    s_k = \arg \min_{\lVert s \rVert_{x_k} \leq \Delta_k} m_k( s ) = \arg \min_{\lVert s \rVert_{x_k} \leq \Delta_k} f(x_k) + g_{x_k}(\operatorname{grad} f(x_k), s ) + \frac{1}{2} g_{x_k}( s , \mathcal{H}_k [ s ] ).
+Let us now turn to the quadratic term $\mathcal{H}_k \colon \tangent{x_k} \to \tangent{x_k}$ in \cref{RiemannianQuadraticModel}. It can be shown, if $\mathcal{H}_k$ is a sufficiently good approximation of the Hessian operator $\operatorname{Hess} f(x_k)$ and under further (strong) assumptions, among others on the retraction $\retractionSymbol$, that the the sequence $\{ x_k \}_k$ from the resulting method converges q-superlinearly (see \cite[Theorem~7.4.11]{AbsilMahonySepulchre:2008}). A possible choice would be the Riemannian Hessian $\mathcal{H}_k = \operatorname{Hess} f(x_k)$ and for $\retractionSymbol$ the exponential map $\expOp$ (see \cite[p.~102]{AbsilMahonySepulchre:2008}). But as in the Euclidean case, the application of $\operatorname{Hess} f(x_k)$ can be very costly or $\operatorname{Hess} f(x_k)$ doesn't even exist and for $\expOp$ these can also be reasons why one does not use this method. Therefore, we are looking for an approximation of $\operatorname{Hess} f(x_k)$ that is easy to compute but still produces a fast rate of convergence. This leads us to genralizing the SR1 update \cref{directSR1formula} for the Riemannian setup. \\
+This means we want to approximate the action of the Riemannian Hessian $\operatorname{Hess} f(x_k)$ with a linear self-adjoint operator $\mathcal{H}^\mathrm{SR1}_k \colon \tangent{x_k} \to \tangent{x_k}$, which is updated (in each iteration) with information about the curvature obtained by $s_k, \operatorname{grad} f(x_k) \in \tangent{x_k}$ and $\operatorname{grad} f(\widetilde{x}_{k+1}) \in \tangent{\widetilde{x}_{k+1}}$ to a new operator $\mathcal{H}^\mathrm{SR1}_{k+1} \colon \tangent{x_{k+1}} \to \tangent{x_{k+1}}$, which acts on the tangent space at the upcomming iterate $x_{k+1}$. To be able to use the information from different tangent spaces, we need a tool that transports tangent vectors and preferably operators between them:
+\begin{definition}[{\cite[Definition~8.1.1]{AbsilMahonySepulchre:2008}}]\label{VectorTransport}
+    A vector transport on a manifold $\mathcal{M}$ is a smooth map 
+    \begin{align*}
+        \vectorTransportSymbol \colon \; \tangent{} \oplus \tangent{} & \to \tangent{} \\
+        (\eta_x, \xi_x) & \mapsto \vectorTransportDir{x}{\eta_x}(\xi_x)
+    \end{align*}    
+    satisfying the following properties for all $x \in \mathcal{M}$:
+    \begin{enumerate}
+        \item (Associated retraction) There exists a retraction $\retractionSymbol$, called the retraction associated with $\vectorTransportSymbol$, such that the following diagram commutes \begin{equation*}
+        \begin{xy} \xymatrix{(\eta_x, \xi_x) \ar[r]^{\vectorTransportSymbol} \ar[d] & \vectorTransportDir{x}{\eta_x}(\xi_x) \ar[d]^\pi \\ \eta_x \ar[r]_{\retractionSymbol} & \pi (\vectorTransportDir{x}{\eta_x}(\xi_x)) } \end{xy} \end{equation*} where $\pi (\vectorTransportDir{x}{\eta_x}(\xi_x))$ denotes the foot of the tangent vector $\vectorTransportDir{x}{\eta_x}(\xi_x)$. \label{VectorTransport1}
+        \item (Consistency) $\vectorTransportDir{x}{0_x}(\xi_x) = \xi_x$ for all $\xi_x \in \tangent{x}$; 
+        \item (Linearity) $\vectorTransportDir{x}{\eta_x}(a \xi_x + b \zeta_x) = a \vectorTransportDir{x}{\eta_x}(\xi_x) + b \vectorTransportDir{x}{\eta_x}(\zeta_x)$.
+    \end{enumerate}
+\end{definition}
+A vector transport $\vectorTransportSymbol^S \colon \; \tangent{} \oplus \tangent{} \to \tangent{}$ with associated retraction $\retractionSymbol$ is called isometric if it satisfies for all $x \in \mathcal{M}$
+\begin{equation}\label{IsometricVectorTransport}
+    g_{\retract{x}(\eta_x)}(\vectorTransportDir{x}{\eta_x}(\xi_x)[S], \vectorTransportDir{x}{\eta_x}(\zeta_x)[S]) = g_x (\xi_x, \zeta_x)
 \end{equation}
-
-
-A general symmetric rank-one update has the form
-\begin{equation*}
-    H_{k+1} = H_k + \sigma \, v v^{\mathrm{T}},
-\end{equation*}
-where $v \in \mathbb{R}^n$ and $\sigma \in \{-1,1\}$. The task now is to determine $v$ and $\sigma$ so that $H_{k+1}$ satisfies the quasi-Newton equation, \cref{quasi-NewtonEquation}. By substituting into \cref{quasi-NewtonEquation}, we obtain
-\begin{equation}
-    H_k s_k + [\sigma \, v^{\mathrm{T}} s_k] v = y_k.
-\end{equation}
-Since $[\sigma \, v^{\mathrm{T}} s_k]$ is a scalar, $v$ must be a multiple of $y_k − H_k s_k$, i.e. $v = \delta (y_k − H_k s_k)$ for some $\delta \in \mathbb{R}$. By substituting this form of $v$ into , we obtain
-\begin{equation}
-    (y_k − H_k s_k) = \sigma \, \delta^2 \, [s^{\mathrm{T}}_k (y_k − H_k s_k)](y_k − H_k s_k),
-\end{equation}
-and it is clear that this equation is satisfied if (and only if) we choose the parameters $\delta$ and $\sigma$ to be
-\begin{equation*}
-    \sigma = \operatorname{sgn} (s^{\mathrm{T}}_k (y_k − H_k s_k)), \quad \delta = \pm \lvert s^{\mathrm{T}}_k (y_k − H_k s_k) \rvert^{-\frac{1}{2}}.
-\end{equation*}
-
-
-Hence the direct SR1 update for operators on tangent spaces of the manifold which approximates the action of the Riemannian Hessian $\operatorname{Hess} f(x_{k+1}) [\cdot]$ is given by 
+for all $\eta_x, \xi_x, \zeta_x \in \tangent{x}$ \cite[p.~10]{Huang:2013}. We use $\vectorTransportSymbol^S$ to denote an isometric vector transport. \\
+Thus, we are now able to summarize the information for the update in one tangent space. Since, as in the Euclidean case, we want to update $\mathcal{H}^\mathrm{SR1}_k$ before deciding whether or not to accept the candidate $\widetilde{x}_{k+1}$, we use the tangent space at the current iterate $\tangent{x_k}$. For this we define $y_k = {\mathrm{T}^{S}_{x_k, s_k}}^{-1} ( \operatorname{grad}f(\widetilde{x}_{k+1}) ) - \operatorname{grad}f(x_k) \in \tangent{x_k}$, where the associated retraction of $\vectorTransportSymbol^S$ is our chosen retraction $\retractionSymbol$. \\
+To be able to create rank-one operators, we introduce the musical isomorphism $\flat \colon \; \tangent{x_k} \ni \eta_{x_k} \mapsto \eta^{\flat}_{x_k} \in \cotangent{x_k}$ (see \cite[p.~6]{BergmannHerzogLouzeiroSilvaTenbrinckVidalNunez:2020:1}). Put simply, it means: $\eta^{\flat}_{x_k} \in \cotangent{x_k}$ represents the flat of $\eta_{x_k} \in \tangent{x_k}$, i.e., $\eta^{\flat}_{x_k} \colon \; \tangent{x_k} \to \mathbb{R}, \; \xi_{x_k} \mapsto \eta^{\flat}_{x_k}[\xi_{x_k}] = g_{x_k} (\eta_{x_k}, \xi_{x_k})$. This generalizes the notion of the transpose from the Euclidean case. It can be shown that $\eta_{x_k} \eta^{\flat}_{x_k} \tangent{x_k} \to \tangent{x_k}$ is a linear self-adjoint positive definite rank-one operator. \\
+With $s_k \in \tangent{x_k}$, which generalizes the connection between the current iterate $x_k$ and the candidate $\widetilde{x}_{k+1}$, $y_k \in \tangent{x_k}$, which generalizes the difference of the gradients at $x_k$ and $\widetilde{x}_{k+1}$, and by introducing the notion of the flat $\flat$, we can now define a self-adjoint rank-one, also short SR1, update for operators on the tangent space at the current iterate $\tangent{x_k}$:
 \begin{equation}\label{RiemannianDirectSR1formula}
-    \mathcal{H}^\mathrm{RSR1}_{k+1} [\cdot] = \widetilde{\mathcal{H}}^\mathrm{SR1}_k [\cdot] + \frac{(y_k - \widetilde{\mathcal{H}}^\mathrm{SR1}_k [s_k]) (y_k - \widetilde{\mathcal{H}}^\mathrm{SR1}_k [s_k])^{\flat} [\cdot] }{(y_k - \widetilde{\mathcal{H}}^\mathrm{SR1}_k [s_k])^{\flat} [s_k]}
+    \widetilde{\mathcal{H}}^{SR1}_{k+1} [\cdot] = \mathcal{H}^\mathrm{SR1}_k [\cdot] + \frac{(y_k - \mathcal{H}^\mathrm{SR1}_k [s_k]) (y_k - \mathcal{H}^\mathrm{SR1}_k [s_k])^{\flat} [\cdot] }{(y_k - \mathcal{H}^\mathrm{SR1}_k [s_k])^{\flat} [s_k]}.
 \end{equation}
-\cite[p.~18]{Huang:2013}.
+We see immediately that \cref{RiemannianDirectSR1formula} creates a self-adjoint operator if $\mathcal{H}^\mathrm{SR1}_k$ is self-adjoint. But even if $\mathcal{H}^\mathrm{SR1}_k$ is positive definite, $\widetilde{\mathcal{H}}^{SR1}_{k+1}$ may not have the same property. If and only if $(y_k - \mathcal{H}^\mathrm{SR1}_k [s_k])^{\flat} [s_k] > 0$, the SR1 update retains positive definiteness. \\
+As in the Euclidean case, the update \cref{RiemannianDirectSR1formula} has a close connection to Riemannian quasi-Newton methods, where it is required that the approximation of the Hessian operator $\operatorname{Hess} f(x_{k+1})$ generated by the corresponding update satisfies some kind of Riemann quasi-Newton equation (for more details see \cite[Chapter~2]{Huang:2013}). For \cref{RiemannianDirectSR1formula}, it can be shown that 
+\begin{equation*}
+    \widetilde{\mathcal{H}}^{SR1}_{k+1} [s_k] = y_k 
+\end{equation*}
+holds, which generalizes \cref{quasi-NewtonEquation} in this context. \\
+
+
+There is also the possibility that this method can break down if the numerator in \cref{RiemannianDirectSR1formula} is equal to zero. In order to overcome this, can be transferred to the Riemannian setup. This means that \cref{RiemannianDirectSR1formula} is only executed if
+\begin{equation}\label{RiemannianSafeguard}
+    \lvert g_{x_{k+1}}(y_k - \widetilde{\mathcal{H}}^\mathrm{SR1}_k [s_k], s_k) \lvert \; \geq \; r \; \lVert s_k \rVert_{x_{k+1}} \lVert y_k - \widetilde{\mathcal{H}}^\mathrm{SR1}_k [s_k] \rVert_{x_{k+1}} 
+\end{equation}
+holds, where $g_{x_{k+1}}(\cdot, \cdot) \colon \; \tangent{x_{k+1}} \times \tangent{x_{k+1}} \to \mathbb{R}$ is the inner product on $\tangent{x_{k+1}}$ (see \cite[p.~6]{BergmannHerzogLouzeiroSilvaTenbrinckVidalNunez:2020:1}) and $ \lVert \cdot \rVert_{x_{k+1}} = \sqrt{g_{x_{k+1}}(\cdot, \cdot)}$ denotes the resulting norm on $\tangent{x_{k+1}}$. The factor $r$ is again in the interval $(0,1)$. \\
 
 
 
-It is easy to see in that even if $H^\mathrm{SR1}_k$ is positive definite, $H^\mathrm{SR1}_{k+1}$ may not have the same property (this holds also for $B^\mathrm{SR1}_k$ and $B^\mathrm{SR1}_{k+1}$). If and only if $(y_k - H^\mathrm{SR1}_k s_k)^{\mathrm{T}} s_k > 0$, the SR1 update retains positive definiteness. However, this condition is difficult to guarantee. This means that $H^\mathrm{SR1}_{k+1}$ or $B^\mathrm{SR1}_{k+1}$ may no longer be invertible. Moreover, $d_{k+1} = -{H^\mathrm{SR1}_{k+1}}^{-1} \nabla f(x_{k+1}) = -B^\mathrm{SR1}_{k+1} \nabla f(x_{k+1})$ is not necessarily a descent direction. \\
+
+
+
+
+
+
+
+
+
+
+
+
 The main drawback of the SR1 update formula is that the denominator in \cref{directSR1formula} or   can vanish. In fact, even when the objective function $f$ is convex and quadratic, there may be steps on which there is no symmetric rank-one update that satisfies the quasi-Newton equation \cref{quasi-NewtonEquation}. This disadvantage results in serious numerical difficulties, which restrict the applications of it. Nevertheless, the SR1 update formula has the following advantages:
 For the vanishing denominator in \cref{directSR1formula} we introduce a strategy to prevent a method using the SR1 update from breaking down. It has been observed in practice that it performs well simply by skipping the update if the denominator is small. More specifically, the update \cref{directSR1formula} is applied only if 
 \begin{equation}
@@ -113,13 +114,6 @@ holds, where $r \in (0, 1)$ is a small number, e.g. $r = 10^{−8}$. Most implem
 
 
 
-We see immediately that \cref{RiemannianDirectSR1formula} creates a self-adjoint operator if $\mathcal{H}^\mathrm{SR1}_k$ is self-adjoint. 
-
-There is also the possibility that this method can break down if the numerator in \cref{RiemannianDirectSR1formula} is equal to zero. In order to overcome this, can be transferred to the Riemannian setup. This means that \cref{RiemannianDirectSR1formula} is only executed if
-\begin{equation}\label{RiemannianSafeguard}
-    \lvert g_{x_{k+1}}(y_k - \widetilde{\mathcal{H}}^\mathrm{SR1}_k [s_k], s_k) \lvert \; \geq \; r \; \lVert s_k \rVert_{x_{k+1}} \lVert y_k - \widetilde{\mathcal{H}}^\mathrm{SR1}_k [s_k] \rVert_{x_{k+1}} 
-\end{equation}
-holds, where $g_{x_{k+1}}(\cdot, \cdot) \colon \; \tangent{x_{k+1}} \times \tangent{x_{k+1}} \to \mathbb{R}$ is the inner product on $\tangent{x_{k+1}}$ (see \cite[p.~6]{BergmannHerzogLouzeiroSilvaTenbrinckVidalNunez:2020:1}) and $ \lVert \cdot \rVert_{x_{k+1}} = \sqrt{g_{x_{k+1}}(\cdot, \cdot)}$ denotes the resulting norm on $\tangent{x_{k+1}}$. The factor $r$ is again in the interval $(0,1)$. \\
 
 
 
