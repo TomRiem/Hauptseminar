@@ -26,7 +26,7 @@ For now we just consider a quadratic model of the pullback $\hat{f}_{x_k}$:
 \begin{equation}\label{RiemannianQuadraticModel}
     \hat{m}_k( s ) = f(x_k) + g_{x_k}(\operatorname{grad} f(x_k), s) + \frac{1}{2} g_{x_k}( s, \mathcal{H}_k [s]),
 \end{equation}
-where $\mathcal{H}_k$ is some linear self-adjoint operator on $\tangent{x_k}$. This model \cref{RiemannianQuadraticModel} is easier to handle than the pullback $\hat{f}_{x_k}$ and its purpose is to approximate $\hat{f}_{x_k}$ within a suitable neighbourhood of the zero tangent vector $0_{x_k} \in \tangent{x_k}$ which we refer to as the trust-region. By using the norm $\lVert \cdot \rVert_{x_k}$ induced by the Riemannian metric, we can define the trust-region as the set of all points
+where $\mathcal{H}_k$ is some linear self-adjoint operator on $\tangent{x_k}$. This model \cref{RiemannianQuadraticModel} is easier to handle than the pullback $\hat{f}_{x_k}$ and its purpose is to approximate $\hat{f}_{x_k}$ within a suitable neighbourhood of the zero tangent vector $0_{x_k} \in \tangent{x_k}$ which we refer to as the trust-region. By using the norm $\lVert \cdot \rVert_{x_k}$ induced by the Riemannian metric, we can define the trust-region as 
 \begin{equation}\label{RiemannianTrustRegion}
     \{ s \in \tangent{x_k} \colon \ \lVert s \rVert_{x_k} \leq \Delta_k \}
 \end{equation}
