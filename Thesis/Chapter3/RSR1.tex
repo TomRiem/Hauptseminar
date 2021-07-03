@@ -87,23 +87,23 @@ Right now have the operator $\widetilde{\mathcal{H}}^{SR1}_{k+1} \colon \tangent
 \begin{algorithm}[H]
     \caption{Riemannian Trust-Region Symmetric Rank-One Method}\label{RTR-SR1Method}
     \begin{algorithmic}[1]
-        \State Riemannian manifold $(\mathcal{M}, g)$; isometric vector transport $\vectorTransportSymbol^S$ with $\retractionSymbol$ as associated retraction; continuously differentiable real-valued function $f$ on $\mathcal{M}$, bounded below; initial iterate $x_0 \in \mathcal{M}$; initial self-adjoint operator $\mathcal{H}^\mathrm{SR1}_0 \colon \; \tangent{x_0} \to \tangent{x_0}$; initial trust-region radius $\Delta_0 > 0$; safeguard constant $r \in (0,1)$; rejection boundary $\rho^{\prime} \in (0, 0.1)$; trust-region reduction factor $\tau_1 \in (0,1)$; trust-region magnification factor $\tau_2 > 1$; convergence tolerance $\varepsilon > 0$. Set $k = 0$.
+        \State Riemannian manifold $(\mathcal{M}, g)$; isometric vector transport $\vectorTransportSymbol^S$ with $\retractionSymbol$ as associated retraction; continuously differentiable real-valued function $f$ on $\mathcal{M}$, bounded below; initial iterate $x_0 \in \mathcal{M}$; initial linear self-adjoint operator $\mathcal{H}^\mathrm{SR1}_0 \colon \; \tangent{x_0} \to \tangent{x_0}$; initial trust-region radius $\Delta_0 > 0$; safeguard tolerance $r \in (0,1)$; acceptance tolerance $\rho^{\prime} \in (0, 0.1)$; trust-region decrease factor $\tau_1 \in (0,1)$; trust-region increase factor $\tau_2 > 1$; convergence tolerance $\varepsilon > 0$. Set $k = 0$.
         \While{$\lVert \nabla f(x_k) \rVert > \varepsilon$}
-            \State Obtain $s_k$ (approximately) solving \cref{Riemanniantrsubproblem} using $\mathcal{H}^\mathrm{SR1}_k$.
-            \State Set $\widetilde{x}_{k+1} = \retract{x_k}(s_k)$ and ${T^{S}_{x_k, s_k}}^{-1} ( \operatorname{grad}f(\widetilde{x}_{k+1}) ) - \operatorname{grad}f(x_k) \in \tangent{x_k}$.
+            \State Obtain $s_k$ by (approximately) solving \cref{Riemanniantrsubproblem} using $\mathcal{H}_k = \mathcal{H}^\mathrm{SR1}_k$.
+            \State Set $\widetilde{x}_{k+1} = \retract{x_k}(s_k)$ and $y_k = {\mathrm{T}^{S}_{x_k, s_k}}^{-1} ( \operatorname{grad}f(\widetilde{x}_{k+1}) ) - \operatorname{grad}f(x_k)$.
             \If{\cref{RiemannianSafeguard} holds}
                 \State Compute $\widetilde{\mathcal{H}}^\mathrm{SR1}_{k+1} \colon \tangent{x_{k}} \to \tangent{x_{k}}$ by means of \cref{RiemannianDirectSR1formula}.
 			\Else 
 				\State Set $\widetilde{\mathcal{H}}^\mathrm{SR1}_{k+1} = \mathcal{H}^\mathrm{SR1}_k$.
             \EndIf 
-            \State Compute $\rho_k = \frac{f(x_k) - f(\widetilde{x}_{k+1})}{m_k(0) - m_k(s_k)}$.
+            \State Compute $\rho_k = \frac{f(x_k) - f(\widetilde{x}_{k+1})}{\hat{m}_k(0_{x_k}) - \hat{m}_k(s_k)}$.
             \If{$\rho_k > \rho^{\prime}$}
-                \State Set $x_{k+1} = \widetilde{x}_{k+1}$ and $\mathcal{H}^\mathrm{SR1}_{k+1} = T^{S}_{x_k, s_k} \circ \widetilde{\mathcal{H}}^\mathrm{SR1}_{k+1} \circ  {T^{S}_{x_k, s_k}}^{-1} \colon \tangent{x_{k+1}} \to \tangent{x_{k+1}}$.
+                \State Set $x_{k+1} = \widetilde{x}_{k+1}$ and $\mathcal{H}^\mathrm{SR1}_{k+1} = T^{S}_{x_k, s_k} \circ \widetilde{\mathcal{H}}^\mathrm{SR1}_{k+1} \circ  {T^{S}_{x_k, s_k}}^{-1} \colon \tangent{\widetilde{x}_{k+1}} \to \tangent{\widetilde{x}_{k+1}}$.
 			\Else 
 				\State Set $x_{k+1} = x_k$ and $\mathcal{H}^\mathrm{SR1}_{k+1} = \widetilde{\mathcal{H}}^\mathrm{SR1}_{k+1} \colon \tangent{x_{k}} \to \tangent{x_{k}}$.
             \EndIf 
             \If{$\rho_k > 0.75$}
-                \If{$\lVert s_k \rVert \geq 0.8 \ \Delta_k$}
+                \If{$\lVert s_k \rVert_{x_k} \geq 0.8 \ \Delta_k$}
                     \State Set $\Delta_{k+1} = \tau_2 \ \Delta_k$.
                 \Else 
                     \State Set $\Delta_{k+1} = \Delta_k$.
