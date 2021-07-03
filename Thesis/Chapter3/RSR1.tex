@@ -8,7 +8,7 @@ Given a objective function $f \colon \mathcal{M} \to \mathbb{R}$ and a current i
 \end{align*}
 The Riemannian metric turns the tangent space $\tangent{x_k}$ into a Euclidean space endowed with the inner product $g_{x_k}(\cdot, \cdot)$, which enables us to construct a order-2 model of the pullback $\hat{f}_{x_k}$:
 \begin{align*}
-    \hat{m}_k( s ) & = \hat{f}_{x_k}(0_{x_k}) + \mathrm{D} \, \hat{f}_{x_k}(0_{x_k}) [s] + \frac{1}{2} \mathrm{D} \, \hat{f}_{x_k}(0_{x_k}) [s, s] \\
+    \hat{m}_k( s ) & = \hat{f}_{x_k}(0_{x_k}) + \mathrm{D} \, \hat{f}_{x_k}(0_{x_k}) [s] + \frac{1}{2} \mathrm{D}^2 \, \hat{f}_{x_k}(0_{x_k}) [s, s] \\
     & = f(x_k) + g_{x_k}(\operatorname{grad} f(x_k), s ) + \frac{1}{2} g_{x_k}( s, \operatorname{Hess} \hat{f}_{x_k}(0_{x_k}) [s]).
 \end{align*}
 By \cref{Retraction} we get $\hat{f}_{x_k}(0_{x_k}) = f(\retract{x_k}(0_{x_k})) = f(x_k)$ and since the local rigidity condition \cref{LocalRigidity} holds, we have $\mathrm{D} \, \hat{f}_{x_k}(0_{x_k}) = \mathrm{D} \, f(x_k)$, hence $\operatorname{grad} \hat{f}_{x_k}(0_{x_k}) = \operatorname{grad} f(x_k)$. \\
@@ -120,7 +120,6 @@ Right now have the operator $\widetilde{\mathcal{H}}^{SR1}_{k+1} \colon \tangent
         \State \textbf{Return} $x_k$.
     \end{algorithmic}
 \end{algorithm}
-
 We summarize the most important results of the convergence analysis of \cref{RTR-SR1Method}, which can be found in \cite{HuangAbsilGallivan:2014}. For this we need some more assumptions, which are among others also specific for the Riemannian setup. \\
 For this we need some more assumptions, which are among others also specific for the Riemannian setup. \\
 We assume throughout that $f \in C^2$ and we denote by $\Omega$ the sublevel set of $x_0$, i.e.
