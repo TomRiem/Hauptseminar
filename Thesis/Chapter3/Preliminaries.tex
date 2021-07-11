@@ -24,12 +24,12 @@ The Riemannian distance of two points $x,y \in \mathcal{M}$ is defined by
 where $\Gamma$ is the set of all curves in $\mathcal{M}$ joining the points $x$ and $y$ \cite[p.~46]{AbsilMahonySepulchre:2008}. \\
 In the Euclidean case, the gradient provides us with useful information. For a real-valued function $f$, the Riemannian gradient $\operatorname{grad} f(x)$ of $f$ at $x$ is the unique tangent vector such that
 \begin{equation*}
-    \mathrm{D} \, f(x) [\xi_x] = g_x (\operatorname{grad} f(x), \xi_x), \quad \text{for all } \xi_x \tangent{x},
+    \mathrm{D} \, f(x) [\xi_x] = g_x (\operatorname{grad} f(x), \xi_x), \quad \text{for all} \; \xi_x \in \tangent{x},
 \end{equation*}
 where $\mathrm{D} \, f(x)$ denotes the differential of $f$ at $x$ \cite[p.~46]{AbsilMahonySepulchre:2008}. \\
 The Hessian is required in second-order optimization algorithms, such as the Trust-Region Newton method. The Riemannian Hessian represents the covariant derivative of the gradient in the direction of the chosen tangent vector, i.e. the Riemannian Hessian of $f$ at $x$ is a linear operator on $\tangent{x}$ defined by
 \begin{equation*}
-    \operatorname{Hess} f(x) [\xi_{x}] = \nabla_{\xi_{x}} \operatorname{grad} f(x) \quad \text{for all } \xi_x \in \tangent{x},
+    \operatorname{Hess} f(x) [\xi_{x}] = \nabla_{\xi_{x}} \operatorname{grad} f(x) \quad \text{for all} \; \xi_x \in \tangent{x},
 \end{equation*}
 where $\nabla$ denotes the so-called Levi-Civita connection, which is a unique affine connection on a Riemannian Manifold $\mathcal{M}$ (see \cite[Theorem~5.3.1~(Levi-Civita)]{AbsilMahonySepulchre:2008}). Furthermore, the Riemannian Hessian $\operatorname{Hess} f(x)$ is a self-adjoint operator on each tangent space, i.e. it holds $g_x(\operatorname{Hess} f(x) [\xi_{x}], \eta_x) = g_x(\xi_{x}, \operatorname{Hess} f(x) [\eta_x])$ for all $\xi_x, \eta_x \in \tangent{x}$ and all $x \in \mathcal{M}$ \cite[p.~105]{AbsilMahonySepulchre:2008}. \\
 On a manifold, the notion of moving in the direction of a tangent vector, while staying on the manifold, is generalized by the notion of a so-called retraction:

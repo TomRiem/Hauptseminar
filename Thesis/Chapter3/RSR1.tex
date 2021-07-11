@@ -3,7 +3,7 @@
 We will first consider Trust-Region methods on Riemannian manifolds in general. To do this, we must construct a quadratic model of our objective function $f$, which is defined on a Riemannian manifold $\mathcal{M}$. But this is not, in general, a Euclidean space, which makes the situation quite difficult. To avoid this problem, we choose a retraction, $\retractionSymbol$, which provides a way to pull back the objective function on the manifold $\mathcal{M}$ to a objective function on the tangent space $\tangent{x_k}$ at each iterate. \\
 Given a objective function $f \colon \ \mathcal{M} \to \mathbb{R}$ and a current iterate $x_k \in \mathcal{M}$, we use $\retract{x_k}$ to locally map the minimization problem for $f$ on $\mathcal{M}$ into a minimization problem for the pullback $\hat{f}_{x_k}$ of $f$ under $\retract{x_k}$ on the tangent space $\tangent{x_k}$, which means in each iteration we consider 
 \begin{equation*}
-    \min \hat{f}_{x_k} (\xi_{x_k}) = f(\retract{x_k}(\xi_{x_k})), \quad \xi_{x_k} \in \tangent{x_k}
+    \min \hat{f}_{x_k} (\xi_{x_k}) = f(\retract{x_k}(\xi_{x_k})), \quad \xi_{x_k} \in \tangent{x_k}.
 \end{equation*}
 The Riemannian metric turns the tangent space $\tangent{x_k}$ into a Euclidean space endowed with the inner product $g_{x_k}(\cdot, \cdot)$, which enables us to construct a order-2 model of the pullback $\hat{f}_{x_k}$:
 \begin{align*}
@@ -60,9 +60,9 @@ satisfying the following properties for all $x \in \mathcal{M}$:
     \item (Linearity) $\vectorTransportDir{x}{\eta_x}(a \xi_x + b \zeta_x) = a \vectorTransportDir{x}{\eta_x}(\xi_x) + b \vectorTransportDir{x}{\eta_x}(\zeta_x)$;
 \end{enumerate}
 \cite[Definition~8.1.1]{AbsilMahonySepulchre:2008}. A vector transport $\vectorTransportSymbol^S \colon \ \tangent{} \oplus \tangent{} \to \tangent{}$ with associated retraction $\retractionSymbol$ is called isometric if it satisfies
-\begin{equation}\label{IsometricVectorTransport}
+\begin{equation*}
     g_{\retract{x}(\eta_x)}(\vectorTransportDir{x}{\eta_x}(\xi_x)[S], \vectorTransportDir{x}{\eta_x}(\zeta_x)[S]) = g_x (\xi_x, \zeta_x)
-\end{equation}
+\end{equation*}
 for all $\eta_x, \xi_x, \zeta_x \in \tangent{x}$ and $x \in \mathcal{M}$ \cite[p.~10]{Huang:2013}. We use $\vectorTransportSymbol^S$ to denote an isometric vector transport. \\
 We are now able to summarize the information for the update in one tangent space. Since, as in the Euclidean case, we want to update $\mathcal{H}^\mathrm{SR1}_k$ before deciding whether or not to accept the candidate $\widetilde{x}_{k+1}$, we use the tangent space at the current iterate $\tangent{x_k}$. For this we define $y_k = {\mathrm{T}^{S}_{x_k, s_k}}^{-1} ( \operatorname{grad}f(\widetilde{x}_{k+1}) ) - \operatorname{grad}f(x_k) \in \tangent{x_k}$, where the associated retraction of $\vectorTransportSymbol^S$ is our chosen retraction $\retractionSymbol$. \\
 To be able to create rank-one operators, we introduce the musical isomorphism $\flat \colon \ \tangent{x} \ni \eta_{x} \mapsto \eta^{\flat}_{x} \in \cotangent{x}$ (see \cite[p.~6]{BergmannHerzogLouzeiroSilvaTenbrinckVidalNunez:2020:1}). Put simply, it means: $\eta^{\flat}_{x} \in \cotangent{x}$ represents the flat of $\eta_{x} \in \tangent{x}$, i.e., $\eta^{\flat}_{x} \colon \ \tangent{x} \to \mathbb{R}, \; \xi_{x} \mapsto \eta^{\flat}_{x}[\xi_{x}] = g_{x} (\eta_{x}, \xi_{x})$. This generalizes the notion of the transpose from the Euclidean case. It can be shown that $\eta_{x} \eta^{\flat}_{x} \colon \ \tangent{x} \to \tangent{x}$ is a linear self-adjoint positive definite rank-one operator. \\
